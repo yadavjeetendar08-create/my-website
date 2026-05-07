@@ -1,0 +1,390 @@
+<!
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Chicken Road Pro</title>
+    <style>
+        /* --- APP STYLE --- */
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #121212;
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden; /* No scroll bars */
+            touch-action: none; /* Mobile touch fix */
+        }
+
+        /* --- HEADER (Wallet) --- */
+        .header {
+            background: linear-gradient(90deg, #1e3c72, #2a5298);
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            height: 60px;
+            box-sizing: border-box;
+        }
+        .app-name { font-weight: bold; font-size: 18px; color: #ffeb3b; }
+        .wallet { 
+            background: rgba(0,0,0,0.3); 
+            padding: 5px 15px; 
+            border-radius: 20px; 
+            border: 1px solid #4caf50;
+            font-size: 16px;
+        }
+
+        /* --- GAME AREA --- */
+        #game-wrapper {
+            position: relative;
+            width: 100vw;
+            height: calc(100vh - 200px); /* Space for header and controls */
+            background: #81C784; /* Grass color */
+            overflow: hidden;
+        }
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* --- CONTROLS --- */
+        .controls {
+            height: 140px;
+            background: #222;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        .btn {
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 14px;
+            color: white;
+            cursor: pointer;
+            active: scale(0.95);
+        }
+        .btn-move {
+            grid-column: 1 / 4; /* Full width */
+            background: #ff9800;
+            font-size: 20px;
+            box-shadow: 0 4px #e65100;
+        }
+        .btn-move:active { box-shadow: 0 0 #e65100; transform: translateY(4px); }
+        .btn-dep { background: #4caf50; }
+        .btn-wit { background: #f44336; }
+        .btn-adm { background: #607d8b; }
+
+        /* --- MODALS (Popups) --- */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        .modal-box {
+            background: #333;
+            padding: 20px;
+            border-radius: 15px;
+            width: 80%;
+            text-align: center;
+            border: 1px solid gold;
+        }
+        input {
+            width: 80%; padding: 10px; margin: 10px 0;
+            border-radius: 5px; border: none; font-size: 16px;
+        }
+        .close-btn {
+            margin-top: 10px; background: transparent; color: #aaa; border: 1px solid #aaa;
+        }
+
+        /* Message Overlay */
+        #msg-overlay {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            display: none;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <div class="header">
+        <div class="app-name">🐔 Chicken Road</div>
+        <div class="wallet">💰 ₹<span id="bal">0</span></div>
+    </div>
+
+    <!-- Game Canvas -->
+    <div id="game-wrapper">
+        <canvas id="gameCanvas"></canvas>
+        <div id="msg-overlay">TAP 'JUMP' TO START<br>Cost: ₹10</div>
+    </div>
+
+    <!-- Bottom Controls -->
+    <div class="controls">
+        <button class="btn btn-move" onclick="playerJump()" id="jumpBtn">JUMP (⬆️)</button>
+        <button class="btn btn-dep" onclick="showModal('deposit')">Add Cash</button>
+        <button class="btn btn-wit" onclick="showModal('withdraw')">Withdraw</button>
+        <button class="btn btn-adm" onclick="toggleAdmin()">Admin</button>
+    </div>
+
+    <!-- Deposit/Withdraw Modal -->
+    <div id="modal-payment" class="modal">
+        <div class="modal-box">
+            <h2 id="modal-title">Deposit</h2>
+            <p>Enter Amount (Fake System)</p>
+            <input type="number" id="amount" placeholder="₹ 100">
+            <button class="btn btn-dep" style="width:100%; padding:10px;" onclick="handleTransaction()">Confirm</button>
+            <button class="btn close-btn" onclick="closeModal()">Close</button>
+        </div>
+    </div>
+
+    <!-- Admin Panel -->
+    <div id="admin-panel" class="modal">
+        <div class="modal-box" style="border-color: red;">
+            <h2 style="color:red;">👮 Admin Panel</h2>
+            <p>User ID: 8823 (Demo)</p>
+            <button class="btn btn-dep" onclick="adminSetBal(1000)">Give ₹1000</button>
+            <button class="btn btn-wit" onclick="adminSetBal(0)">Reset to ₹0</button>
+            <br><br>
+            <button class="btn close-btn" onclick="document.getElementById('admin-panel').style.display='none'">Close Panel</button>
+        </div>
+    </div>
+
+    <script>
+        // --- VARIABLES ---
+        let balance = 100; // Starting Fake Money
+        const entryFee = 10;
+        const winPrize = 20;
+        
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        let gameRunning = false;
+        let animationId;
+
+        // Mobile Responsive Size
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight - 200; 
+
+        // Game Objects
+        const laneHeight = 60;
+        let player = { x: canvas.width/2, y: 0, size: 30, emoji: '🐔' };
+        let cars = [];
+        let lanes = [];
+
+        // --- WALLET FUNCTIONS ---
+        function updateUI() {
+            document.getElementById('bal').innerText = balance;
+        }
+        updateUI();
+
+        let currentTransType = '';
+        function showModal(type) {
+            currentTransType = type;
+            document.getElementById('modal-payment').style.display = 'flex';
+            document.getElementById('modal-title').innerText = type === 'deposit' ? 'Add Money' : 'Withdraw Money';
+        }
+        function closeModal() {
+            document.getElementById('modal-payment').style.display = 'none';
+        }
+        function handleTransaction() {
+            const amt = parseInt(document.getElementById('amount').value);
+            if(!amt || amt < 1) { alert("Invalid Amount"); return; }
+            
+            if(currentTransType === 'deposit') {
+                balance += amt;
+                alert("Success! ₹" + amt + " added.");
+            } else {
+                if(balance >= amt) {
+                    balance -= amt;
+                    alert("Withdrawal Request Sent for ₹" + amt);
+                } else {
+                    alert("Insufficient Balance!");
+                }
+            }
+            updateUI();
+            closeModal();
+        }
+
+        // --- GAME LOGIC ---
+        function initGame() {
+            // Reset Player
+            player.y = canvas.height - 40;
+            player.x = canvas.width / 2;
+            
+            // Create Lanes
+            lanes = [];
+            cars = [];
+            const totalLanes = Math.floor(canvas.height / laneHeight);
+            
+            for(let i=0; i<totalLanes; i++) {
+                let y = canvas.height - ((i+1) * laneHeight);
+                let isRoad = i > 0 && i < totalLanes-1; // Top and bottom are safe grass
+                
+                lanes.push({ y: y, isRoad: isRoad });
+
+                if(isRoad) {
+                    // Add cars to this lane
+                    let speed = (Math.random() * 2 + 2) * (Math.random() > 0.5 ? 1 : -1);
+                    let carEmoji = ['🚘', '🚕', '🚓', '🚚'][Math.floor(Math.random()*4)];
+                    
+                    // Add 2 cars per lane
+                    cars.push({ x: Math.random() * canvas.width, y: y + 15, w: 40, h: 30, s: speed, img: carEmoji });
+                    cars.push({ x: Math.random() * canvas.width + 200, y: y + 15, w: 40, h: 30, s: speed, img: carEmoji });
+                }
+            }
+            draw();
+            document.getElementById('msg-overlay').style.display = 'block';
+        }
+
+        function playerJump() {
+            if(!gameRunning) {
+                // Try to start game
+                if(balance >= entryFee) {
+                    balance -= entryFee;
+                    updateUI();
+                    gameRunning = true;
+                    document.getElementById('msg-overlay').style.display = 'none';
+                    gameLoop();
+                } else {
+                    alert("Low Balance! Please Deposit.");
+                    showModal('deposit');
+                }
+                return;
+            }
+
+            // Move Player
+            player.y -= laneHeight;
+            
+            // Check Win
+            if(player.y < 0) {
+                gameOver(true);
+            }
+        }
+
+        function update() {
+            // Move Cars
+            cars.forEach(car => {
+                car.x += car.s;
+                // Loop cars around screen
+                if(car.s > 0 && car.x > canvas.width) car.x = -50;
+                if(car.s < 0 && car.x < -50) car.x = canvas.width;
+
+                // Collision Detection
+                // Simple box collision
+                let px = player.x - 15; // Centering adjustment
+                let py = player.y;
+                
+                if (
+                    px < car.x + car.w &&
+                    px + 30 > car.x &&
+                    py < car.y + car.h &&
+                    py + 30 > car.y
+                ) {
+                    gameOver(false);
+                }
+            });
+        }
+
+        function draw() {
+            // Clear Screen
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw Lanes
+            lanes.forEach(lane => {
+                ctx.fillStyle = lane.isRoad ? "#444" : "#81C784";
+                ctx.fillRect(0, lane.y, canvas.width, laneHeight);
+                
+                // Road markings
+                if(lane.isRoad) {
+                    ctx.strokeStyle = "#FFF";
+                    ctx.setLineDash([20, 20]);
+                    ctx.beginPath();
+                    ctx.moveTo(0, lane.y + laneHeight/2);
+                    ctx.lineTo(canvas.width, lane.y + laneHeight/2);
+                    ctx.stroke();
+                }
+            });
+
+            // Draw Cars
+            ctx.font = "30px Arial";
+            cars.forEach(car => {
+                // Flip car if moving left
+                ctx.save();
+                if(car.s < 0) {
+                    ctx.scale(-1, 1);
+                    ctx.fillText(car.img, -car.x - 40, car.y + 25);
+                } else {
+                    ctx.fillText(car.img, car.x, car.y + 25);
+                }
+                ctx.restore();
+            });
+
+            // Draw Player
+            ctx.fillText(player.emoji, player.x - 15, player.y + 40);
+        }
+
+        function gameLoop() {
+            if(!gameRunning) return;
+            update();
+            draw();
+            animationId = requestAnimationFrame(gameLoop);
+        }
+
+        function gameOver(win) {
+            gameRunning = false;
+            cancelAnimationFrame(animationId);
+            
+            let msg = document.getElementById('msg-overlay');
+            msg.style.display = 'block';
+            
+            if(win) {
+                balance += winPrize;
+                msg.innerHTML = "🏆 YOU WON! <br> +₹20 Added";
+                updateUI();
+            } else {
+                msg.innerHTML = "💥 CRASHED! <br> Try Again (-₹10)";
+                // Shake effect
+                canvas.style.transform = "translate(5px, 5px)";
+                setTimeout(() => canvas.style.transform = "none", 200);
+            }
+            
+            setTimeout(() => {
+                initGame();
+                msg.innerHTML = "TAP 'JUMP' TO START<br>Cost: ₹10";
+            }, 2000);
+        }
+
+        // --- ADMIN ---
+        function toggleAdmin() {
+            document.getElementById('admin-panel').style.display = 'flex';
+        }
+        function adminSetBal(val) {
+            balance = val;
+            updateUI();
+            alert("Admin Balance Updated!");
+        }
+
+        // Initialize First Time
+        initGame();
+
+    </script>
+</body>
+</html>
