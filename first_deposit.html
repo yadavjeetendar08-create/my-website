@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>First Deposit Bonus - RajaLuck</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --primary: #ff6b6b; --bg: #f5f7fa; --white: #ffffff; --gray: #999; }
+        body { margin: 0; font-family: 'Segoe UI', sans-serif; background: var(--bg); padding-bottom: 30px; }
+        
+        /* Header Screenshot ke hisab se */
+        .header { background: var(--white); padding: 15px; display: flex; align-items: center; border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 100; }
+        .header i { font-size: 20px; margin-right: 20px; color: #333; }
+        .header h2 { margin: 0; font-size: 18px; flex: 1; text-align: center; margin-right: 40px; color: #333; }
+
+        /* Banner from top of screenshot */
+        .top-progress { margin: 15px; background: #eee; border-radius: 10px; height: 12px; overflow: hidden; position: relative; }
+        .top-fill { background: #ffc107; height: 100%; width: 0%; transition: 0.5s; }
+        .top-text { text-align: center; font-size: 12px; color: #666; margin-top: -10px; }
+
+        /* Bonus Card Styling */
+        .bonus-card { background: var(--white); margin: 10px 15px; border-radius: 12px; padding: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+        .title { font-size: 15px; font-weight: bold; color: #333; }
+        .reward { font-size: 16px; font-weight: bold; color: #f5a623; }
+        .desc { font-size: 11px; color: var(--gray); margin-bottom: 15px; line-height: 1.4; }
+
+        /* Progress Bar in Card */
+        .progress-container { display: flex; align-items: center; gap: 10px; }
+        .bar-outer { flex: 1; height: 18px; background: #e0e0e0; border-radius: 10px; overflow: hidden; position: relative; }
+        .bar-inner { height: 100%; background: #ff4d4d; transition: 0.5s; }
+        .bar-text { position: absolute; width: 100%; text-align: center; font-size: 11px; color: white; line-height: 18px; font-weight: bold; }
+
+        /* Buttons */
+        .btn { padding: 8px 15px; border-radius: 8px; font-size: 12px; font-weight: bold; border: 1.5px solid #ff4d4d; background: transparent; color: #ff4d4d; cursor: pointer; min-width: 90px; }
+        .btn.receive { background: #7c8fb5; color: white; border: none; }
+        .btn.claimed { background: #ccc; color: #666; border: none; cursor: not-allowed; }
+
+        /* Activity Rules Section */
+        .rules { margin: 20px 15px; padding-bottom: 40px; }
+        .rules-title { background: linear-gradient(to right, #ff8e8e, #ff6b6b); color: white; padding: 5px 15px; border-radius: 20px; font-size: 14px; display: inline-block; margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <i class="fas fa-chevron-left" onclick="history.back()"></i>
+        <h2>First deposit bonus</h2>
+    </div>
+
+    <div style="padding: 15px 15px 0;">
+        <div class="top-progress"><div class="top-fill" id="totalFill"></div></div>
+        <div class="top-text" id="totalTxt">0/60000</div>
+    </div>
+
+    <div id="bonusList">
+        </div>
+
+    <div class="rules">
+        <div class="rules-title">Activity Rules</div>
+        <p style="font-size: 12px; color: #777; line-height: 1.6;">
+            1. Every user can claim the first deposit bonus only once.<br>
+            2. The bonus is automatically calculated based on the first successful deposit amount.<br>
+            3. Min deposit for the first bonus is ₹100.
+        </p>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <script>
+        const firebaseConfig = { apiKey: "AIzaSyA9a_UA1cbr7sx0G1lu90ig18DfEDvmvgk", projectId: "ff-warzone-9c820", authDomain: "ff-warzone-9c820.firebaseapp.com", storageBucket: "ff-warzone-9c820.firebasestorage.app", messagingSenderId: "267357764090", appId: "1:267357764090:web:0691111afd07cb0ff20c43" };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+
+        // Tiers from Screenshot
+        const tiers = [
+            { dep: 100, reward: 28 },
+            { dep: 200, reward: 48 },
+            { dep: 500, reward: 108 },
+            { dep: 1000, reward: 188 },
+            { dep: 5000, reward: 488 },
+            { dep: 12000, reward: 1388 }
+        ];
+
+        let curUID = null;
+        let firstDepositAmount = 0;
+        let claimedBonuses = [];
+
+        auth.onAuthStateChanged(user => {
+            if(user) {
+                curUID = user.uid;
+                db.collection("users").doc(curUID).onSnapshot(doc => {
+                    const data = doc.data();
+                    firstDepositAmount = data.firstDepAmt || 0; // Check users first successful deposit
+                    claimedBonuses = data.claimedBonuses || [];
+                    renderTiers();
+                });
+            } else { location.href = 'login.html'; }
+        });
+
+        function renderTiers() {
+            let html = "";
+            tiers.reverse().forEach(t => {
+                let progress = Math.min((firstDepositAmount / t.dep) * 100, 100);
+                let canClaim = firstDepositAmount >= t.dep && !claimedBonuses.includes(t.dep);
+                let alreadyClaimed = claimedBonuses.includes(t.dep);
+
+                html += `
+                <div class="bonus-card">
+                    <div class="card-top">
+                        <div class="title">first deposit ${t.dep}</div>
+                        <div class="reward">+ ₹${t.reward.toFixed(2)}</div>
+                    </div>
+                    <div class="desc">Deposit ${t.dep} for the first time in your account and you can receive ${t.reward}</div>
+                    <div class="progress-container">
+                        <div class="bar-outer">
+                            <div class="bar-inner" style="width: ${progress}%"></div>
+                            <div class="bar-text">${firstDepositAmount}/${t.dep}</div>
+                        </div>
+                        ${alreadyClaimed ? 
+                            `<button class="btn claimed">Claimed</button>` :
+                            (canClaim ? 
+                                `<button class="btn receive" onclick="claimBonus(${t.dep}, ${t.reward})">receive</button>` : 
+                                `<button class="btn" onclick="location.href='wallet.html'">to Deposit</button>`)
+                        }
+                    </div>
+                </div>`;
+            });
+            document.getElementById('bonusList').innerHTML = html;
+            
+            // Update Top Progress Bar
+            let topPerc = Math.min((firstDepositAmount / 60000) * 100, 100);
+            document.getElementById('totalFill').style.width = topPerc + "%";
+            document.getElementById('totalTxt').innerText = `${firstDepositAmount}/60000`;
+        }
+
+        async function claimBonus(dep, reward) {
+            try {
+                await db.collection("users").doc(curUID).update({
+                    balance: firebase.firestore.FieldValue.increment(reward),
+                    claimedBonuses: firebase.firestore.FieldValue.arrayUnion(dep)
+                });
+                alert(`🎉 Congratulations! ₹${reward} bonus added to your wallet.`);
+            } catch (e) { alert("Error claiming bonus!"); }
+        }
+    </script>
+</body>
+</html>

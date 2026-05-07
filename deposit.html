@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deposit - RajaLuck</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --primary: #fb5b5b; --bg: #f8f9fb; --white: #fff; }
+        body { margin: 0; font-family: sans-serif; background: var(--bg); padding-bottom: 40px; }
+        
+        .header { background: var(--white); padding: 15px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 100; }
+        .header i { font-size: 18px; cursor: pointer; }
+        .header h2 { margin: 0; font-size: 17px; font-weight: bold; }
+
+        .balance-card { background: linear-gradient(135deg, #ff8e8e, #fb5b5b); margin: 15px; padding: 20px; border-radius: 12px; color: white; position: relative; }
+        .bal-amount { font-size: 26px; font-weight: bold; margin: 10px 0; display: flex; align-items: center; }
+        .refresh-btn { font-size: 18px; margin-left: 10px; cursor: pointer; }
+
+        .pay-tabs { display: flex; gap: 10px; padding: 10px 15px; overflow-x: auto; scrollbar-width: none; }
+        .pay-tab { background: white; min-width: 85px; padding: 10px; border-radius: 10px; text-align: center; font-size: 11px; border: 1px solid #eee; }
+        .pay-tab.active { border-color: var(--primary); background: #fff5f5; color: var(--primary); font-weight: bold; }
+        .pay-tab img { width: 25px; display: block; margin: 0 auto 5px; }
+
+        .grid-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 15px; }
+        .channel-item { background: #e0e0e0; padding: 12px 5px; border-radius: 8px; text-align: center; color: #666; font-size: 10px; }
+        .channel-item.active { background: #ff8e8e; color: white; }
+        .channel-name { font-weight: bold; margin-bottom: 2px; font-size: 11px; }
+
+        .amt-container { background: white; margin: 15px; padding: 15px; border-radius: 12px; }
+        .amt-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .amt-item { border: 1px solid #eee; padding: 12px; border-radius: 5px; text-align: center; color: var(--primary); font-weight: bold; cursor: pointer; font-size: 14px; }
+        .amt-input { background: #f5f5f5; border-radius: 25px; padding: 12px 15px; margin-top: 15px; display: flex; align-items: center; }
+        .amt-input input { border: none; background: transparent; flex: 1; outline: none; font-size: 15px; }
+
+        .deposit-btn { background: #dcdcdc; color: #999; border: none; width: calc(100% - 30px); margin: 20px 15px; padding: 15px; border-radius: 30px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .deposit-btn.active { background: var(--primary); color: white; }
+
+        .instruction { background: white; margin: 15px; padding: 15px; border-radius: 12px; font-size: 12px; line-height: 1.6; color: #777; }
+        .inst-title { display: flex; align-items: center; gap: 8px; color: var(--primary); font-weight: bold; margin-bottom: 10px; }
+
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center; }
+        .qr-card { background: white; padding: 20px; border-radius: 15px; text-align: center; width: 85%; }
+        .utr-input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; margin-top: 15px; text-align: center; font-size: 16px; box-sizing: border-box; }
+        .submit-btn { background: var(--primary); color: white; border: none; width: 100%; padding: 12px; border-radius: 8px; margin-top: 12px; font-weight: bold; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <i class="fas fa-chevron-left" onclick="history.back()"></i>
+        <h2>Deposit</h2>
+        <span style="font-size:12px; color:#666;" onclick="location.href='deposit_record.html'">Deposit record</span>
+    </div>
+
+    <div class="balance-card">
+        <div style="font-size:12px; opacity:0.9;"><i class="fas fa-wallet"></i> balanced</div>
+        <div class="bal-amount">
+            ₹<span id="displayBal">0.00</span>
+            <i class="fas fa-sync-alt refresh-btn" onclick="refreshBalance()"></i>
+        </div>
+        <div style="position:absolute; bottom:15px; left:20px; opacity:0.6;"><i class="fas fa-microchip"></i></div>
+        <div style="position:absolute; bottom:15px; right:20px; opacity:0.6; font-size:10px;">**** ****</div>
+    </div>
+
+    <div class="pay-tabs">
+        <div class="pay-tab active"><img src="https://img.icons8.com/color/48/upi.png">UPI-APP</div>
+        <div class="pay-tab"><img src="https://img.icons8.com/color/48/qr-code.png">UPI QR Code</div>
+        <div class="pay-tab"><img src="https://img.icons8.com/color/48/paytm.png">Paytm</div>
+    </div>
+
+    <div class="grid-container">
+        <div class="channel-item active"><div class="channel-name">UpiPay-S</div> ₹100 - 20K</div>
+        <div class="channel-item"><div class="channel-name">UPI-ZipPay</div> ₹100 - 50K</div>
+        <div class="channel-item"><div class="channel-name">UPI-Rspay</div> ₹100 - 50K</div>
+        <div class="channel-item"><div class="channel-name">Payable-App</div> ₹100 - 60K</div>
+        <div class="channel-item"><div class="channel-name">App-PncPay</div> ₹100 - 20K</div>
+        <div class="channel-item"><div class="channel-name">Supe-Pay</div> ₹100 - 50K</div>
+    </div>
+
+    <div class="amt-container">
+        <div class="amt-grid">
+            <div class="amt-item" onclick="setAmt(100)">₹ 100</div>
+            <div class="amt-item" onclick="setAmt(500)">₹ 500</div>
+            <div class="amt-item" onclick="setAmt(1000)">₹ 1000</div>
+            <div class="amt-item" onclick="setAmt(5000)">₹ 5K</div>
+            <div class="amt-item" onclick="setAmt(10000)">₹ 10K</div>
+            <div class="amt-item" onclick="setAmt(20000)">₹ 20K</div>
+        </div>
+        <div class="amt-input">
+            <i class="fas fa-indian-rupee-sign" style="color:var(--primary); margin-right:10px;"></i>
+            <input type="number" id="manualAmt" placeholder="Please enter the amount" oninput="checkBtn()">
+        </div>
+    </div>
+
+    <button class="deposit-btn" id="depBtn" onclick="showQR()">Deposit</button>
+
+    <div class="instruction">
+        <div class="inst-title"><i class="fas fa-book"></i> Deposit instructions</div>
+        <div>◆ Transfer amount must match order.</div>
+        <div>◆ Do not cancel order after payment.</div>
+    </div>
+
+    <div class="modal" id="payModal">
+        <div class="qr-card">
+            <h3 style="margin-top:0;">Scan & Pay</h3>
+            <p id="amtLabel" style="color:var(--primary); font-weight:bold;"></p>
+            <img id="qrImg" src="" style="width:180px; height:180px; border:1px solid #eee;">
+            <div style="margin-top:15px; text-align:left;">
+                <label style="font-size:11px; color:#666;">Enter 12-digit UTR Number:</label>
+                <input type="number" id="utr" class="utr-input" placeholder="0000 0000 0000">
+                <button class="submit-btn" onclick="submitPay()">Submit Transaction</button>
+            </div>
+            <p onclick="closeModal()" style="color:#999; margin-top:15px; font-size:13px; cursor:pointer;">Cancel</p>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+    <script>
+        // --- NEW FIREBASE CONFIG ---
+        var firebaseConfig = { 
+            apiKey: "AIzaSyA9a_UA1cbr7sx0G1lu90ig18DfEDvmvgk", 
+            authDomain: "ff-warzone-9c820.firebaseapp.com", 
+            projectId: "ff-warzone-9c820", 
+            storageBucket: "ff-warzone-9c820.firebasestorage.app", 
+            messagingSenderId: "267357764090", 
+            appId: "1:267357764090:web:0691111afd07cb0ff20c43" 
+        };
+        firebase.initializeApp(firebaseConfig);
+        var db = firebase.firestore();
+        var auth = firebase.auth();
+        var currentUser = null;
+
+        auth.onAuthStateChanged(function(user){
+            if(user){
+                currentUser = user;
+                db.collection("users").doc(user.uid).onSnapshot(function(doc){
+                    if(doc.exists) document.getElementById("displayBal").innerText = (doc.data().balance || 0).toFixed(2);
+                });
+            } else { location.href="login.html"; }
+        });
+
+        function refreshBalance() { location.reload(); }
+        function setAmt(v) { document.getElementById('manualAmt').value = v; checkBtn(); }
+        function checkBtn() {
+            var v = document.getElementById('manualAmt').value;
+            var btn = document.getElementById('depBtn');
+            if(v >= 100) btn.classList.add('active'); else btn.classList.remove('active');
+        }
+
+        function showQR() {
+            var amt = document.getElementById('manualAmt').value;
+            if(amt < 100) return alert("Min ₹100");
+            document.getElementById('amtLabel').innerText = "Amount: ₹" + amt;
+            // Aapka UPI ID QR logic
+            var qrUrl = "https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl=" + encodeURIComponent("upi://pay?pa=jeetendra888@axl&pn=RajaLuck&am="+amt+"&cu=INR");
+            document.getElementById('qrImg').src = qrUrl;
+            document.getElementById('payModal').style.display = 'flex';
+        }
+
+        function closeModal() { document.getElementById('payModal').style.display = 'none'; }
+
+        function submitPay() {
+            var utr = document.getElementById('utr').value;
+            var amt = Number(document.getElementById('manualAmt').value);
+            if(utr.length < 12) return alert("Invalid UTR");
+            
+            // Save to Firebase
+            db.collection("deposits").add({
+                uid: currentUser.uid,
+                amount: amt,
+                utr: utr,
+                status: "pending",
+                time: new Date().toISOString()
+            }).then(function(){
+                alert("Deposit Submitted!");
+                closeModal();
+            });
+        }
+    </script>
+</body>
+</html>

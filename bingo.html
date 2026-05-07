@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Win Go 30s - Raja Luck</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+    <style>
+        :root { --primary: #ff5050; --bg: #f8f8f8; --green: #28c76f; --violet: #9f44d3; }
+        body { margin: 0; font-family: sans-serif; background: var(--bg); padding-bottom: 80px; user-select: none; }
+        
+        /* Header & Wallet */
+        .header { background: var(--primary); color: white; padding: 15px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+        .wallet-card { background: var(--primary); padding: 10px 20px 40px 20px; border-radius: 0 0 30px 30px; color: white; text-align: center; }
+        .balance { font-size: 34px; font-weight: bold; margin: 5px 0; }
+        .wager-info { font-size: 11px; background: rgba(0,0,0,0.2); padding: 5px 10px; border-radius: 15px; display: inline-block; margin-top: 5px; }
+        .wallet-btns { display: flex; justify-content: center; gap: 10px; margin-top: 10px; }
+        .w-btn { background: white; color: var(--primary); border: none; padding: 8px 15px; border-radius: 20px; font-weight: bold; cursor: pointer; font-size: 12px; }
+
+        /* Game Info */
+        .game-info { background: white; margin: -25px 15px 15px 15px; padding: 15px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 10; }
+        .timer-display { font-size: 26px; font-weight: bold; color: var(--primary); }
+        .timer-alert { color: #ff0000 !important; animation: blink 0.5s infinite; }
+        @keyframes blink { 50% { opacity: 0.5; } }
+
+        /* Controls */
+        .bet-area { padding: 0 15px; display: flex; gap: 10px; margin-bottom: 15px; }
+        .btn-game { flex: 1; border: none; padding: 12px 0; border-radius: 10px; color: white; font-weight: bold; cursor: pointer; }
+        .g-green { background: var(--green); } .g-violet { background: var(--violet); } .g-red { background: var(--primary); }
+        .btn-disabled { filter: grayscale(1); pointer-events: none; opacity: 0.6; }
+
+        .num-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; padding: 0 15px 15px 15px; }
+        .num-btn { background: white; border: 1px solid #eee; padding: 10px; border-radius: 50%; font-weight: bold; font-size: 18px; color: #333; cursor: pointer; display: flex; justify-content: center; align-items: center; aspect-ratio: 1; }
+
+        .bs-area { display: flex; gap: 15px; padding: 0 15px 20px 15px; }
+        .bs-btn { flex: 1; padding: 12px; border-radius: 30px; border: none; color: white; font-weight: bold; font-size: 16px; cursor: pointer; }
+        .btn-big { background: orange; } .btn-small { background: #42a5f5; }
+
+        /* Tables */
+        .tabs { display: flex; background: white; margin-top: 10px; border-bottom: 1px solid #eee; }
+        .tab { flex: 1; text-align: center; padding: 15px; font-size: 14px; color: #666; cursor: pointer; }
+        .tab.active { color: var(--primary); border-bottom: 3px solid var(--primary); font-weight: bold; }
+        .table-view { background: white; padding: 10px; display: none; }
+        .table-view.active { display: block; }
+        table { width: 100%; border-collapse: collapse; text-align: center; font-size: 13px; }
+        th { background: #f9f9f9; padding: 10px; color: #888; }
+        td { padding: 12px; border-bottom: 1px solid #eee; }
+        .res-ball { display: inline-block; width: 20px; height: 20px; border-radius: 50%; color: white; line-height: 20px; text-align: center; font-size: 12px; font-weight: bold; }
+
+        /* Bet Modal */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 200; align-items: flex-end; }
+        .modal-content { background: white; width: 100%; padding: 25px 20px; border-radius: 25px 25px 0 0; box-sizing: border-box; }
+        .amt-group { display: flex; gap: 8px; margin: 15px 0; }
+        .amt-btn { flex: 1; padding: 8px; border: 1px solid #ddd; background: #fff; border-radius: 5px; cursor: pointer; font-weight:bold; }
+        .amt-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .action-btn { width: 100%; background: var(--primary); color: white; border: none; padding: 15px; border-radius: 30px; font-weight: bold; font-size: 16px; margin-top: 10px; cursor: pointer; }
+
+        /* WIN ANIMATION */
+        .win-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 300; align-items: center; justify-content: center; flex-direction: column; }
+        .win-card { background: url('https://img.freepik.com/free-vector/celebration-background-with-confetti_23-2147648356.jpg'); background-size: cover; width: 300px; height: 300px; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 0 20px gold; animation: popUp 0.5s ease-out; }
+        @keyframes popUp { from { transform: scale(0); } to { transform: scale(1); } }
+        .win-text { font-size: 32px; font-weight: 900; color: white; text-shadow: 2px 2px 0px #000; margin-bottom: 10px; }
+        .win-amount { font-size: 40px; font-weight: bold; color: yellow; text-shadow: 2px 2px 4px red; }
+    </style>
+</head>
+<body>
+
+    <audio id="tickSound" src="https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3"></audio>
+    <audio id="winSound" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></audio>
+
+    <div class="header">
+        <i class="fas fa-chevron-left" onclick="location.href='index.html'"></i>
+        <div style="font-size:18px; font-weight:bold;">Win Go 30s</div>
+        <i class="fas fa-sync-alt" onclick="location.reload()"></i>
+    </div>
+
+    <div class="wallet-card">
+        <div>Available Balance</div>
+        <div class="balance">₹ <span id="userBalance">0.00</span></div>
+        <div class="wager-info">UID: <span id="userIdText">Loading...</span></div>
+        <div class="wallet-btns">
+            <button class="w-btn" onclick="addTestMoney()">+ Add ₹1000 (Test)</button>
+            <button class="w-btn" onclick="location.href='deposit.html'">Deposit</button>
+            <button class="w-btn" onclick="location.href='withdraw.html'">Withdraw</button>
+        </div>
+    </div>
+
+    <div class="game-info">
+        <div><div style="color:#888; font-size:12px;">Period</div><span id="periodId" style="font-weight:bold; font-size:18px;">Loading...</span></div>
+        <div style="text-align:right;"><div style="color:#888; font-size:12px;">Count Down</div><div class="timer-display" id="timerBox">00:<span id="sec">30</span></div></div>
+    </div>
+
+    <div id="gameControls">
+        <div class="bet-area">
+            <button class="btn-game g-green" onclick="openBet('Green')">Green</button>
+            <button class="btn-game g-violet" onclick="openBet('Violet')">Violet</button>
+            <button class="btn-game g-red" onclick="openBet('Red')">Red</button>
+        </div>
+        <div class="num-grid">
+            <script>
+                for(var i=0; i<=9; i++) {
+                    var c = (i===0||i===5)?'#9f44d3':(i%2===0?'#ff5050':'#28c76f');
+                    document.write('<div class="num-btn" style="color:'+c+'; border-color:'+c+'" onclick="openBet(\''+i+'\')">'+i+'</div>');
+                }
+            </script>
+        </div>
+        <div class="bs-area">
+            <button class="bs-btn btn-big" onclick="openBet('Big')">Big</button>
+            <button class="bs-btn btn-small" onclick="openBet('Small')">Small</button>
+        </div>
+    </div>
+
+    <div class="tabs">
+        <div class="tab active" onclick="switchTab('chart')">Game Record</div>
+        <div class="tab" onclick="switchTab('my')">My Record</div>
+    </div>
+
+    <div id="view-chart" class="table-view active">
+        <table><thead><tr><th>Period</th><th>Num</th><th>Size</th><th>Result</th></tr></thead><tbody id="chartBody"></tbody></table>
+    </div>
+    <div id="view-my" class="table-view">
+        <table><thead><tr><th>Period</th><th>Select</th><th>Amt</th><th>Status</th></tr></thead><tbody id="myRecordBody"></tbody></table>
+    </div>
+
+    <div id="betModal" class="modal">
+        <div class="modal-content">
+            <h3 style="margin-bottom:10px;">Join <span id="selectionName"></span></h3>
+            <div class="amt-group">
+                <button class="amt-btn active" onclick="setAmt(10, this)">10</button>
+                <button class="amt-btn" onclick="setAmt(100, this)">100</button>
+                <button class="amt-btn" onclick="setAmt(500, this)">500</button>
+                <button class="amt-btn" onclick="setAmt(1000, this)">1k</button>
+            </div>
+            <div style="background:#f5f5f5; padding:15px; border-radius:15px; font-size:14px;">
+                <div style="display:flex; justify-content:space-between;"><span>Amount:</span> <span id="rawAmt">10</span></div>
+                <div style="display:flex; justify-content:space-between; color:red;"><span>GST (2%):</span> <span id="gstAmt">0.20</span></div>
+                <div style="display:flex; justify-content:space-between; font-weight:bold; border-top:1px solid #ddd; margin-top:5px; padding-top:5px;"><span>Total:</span> <span id="finalAmt">9.80</span></div>
+            </div>
+            <button class="action-btn" onclick="confirmBet()">Confirm</button>
+            <button onclick="closeAllModals()" style="width:100%; background:transparent; border:none; color:#888; margin-top:10px;">Cancel</button>
+        </div>
+    </div>
+
+    <div id="winModal" class="win-modal" onclick="this.style.display='none'">
+        <div class="win-card">
+            <div class="win-text">YOU WON!</div>
+            <div class="win-amount" id="winAmtDisplay">₹0.00</div>
+            <div style="color:white; margin-top:10px; font-size:12px;">Tap to close</div>
+        </div>
+    </div>
+
+    <script>
+        // --- FIREBASE CONFIG ---
+        var firebaseConfig = { apiKey: "AIzaSyA9a_UA1cbr7sx0G1lu90ig18DfEDvmvgk", authDomain: "ff-warzone-9c820.firebaseapp.com", projectId: "ff-warzone-9c820", storageBucket: "ff-warzone-9c820.firebasestorage.app", messagingSenderId: "267357764090", appId: "1:267357764090:web:0691111afd07cb0ff20c43" };
+        firebase.initializeApp(firebaseConfig);
+        var db = firebase.firestore();
+        
+        var currentBal = 0;
+        var currentPeriodId = ""; 
+        var selectedBet = "", betAmount = 10;
+        var myCurrentBets = []; 
+
+        // --- 1. LOCAL AUTH BYPASS (Ab Error Nahi Aayega) ---
+        var localUid = localStorage.getItem("my_game_uid");
+        if(!localUid) {
+            localUid = "USER_" + Math.floor(Math.random() * 900000 + 100000);
+            localStorage.setItem("my_game_uid", localUid);
+        }
+        var currentUser = { uid: localUid };
+        document.getElementById("userIdText").innerText = localUid;
+
+        // --- 2. LOAD BALANCE INSTANTLY ---
+        db.collection("users").doc(currentUser.uid).onSnapshot(function(doc) {
+            if(doc.exists) { 
+                currentBal = doc.data().balance || 0; 
+                document.getElementById("userBalance").innerText = currentBal.toFixed(2); 
+            } else {
+                // Initial Balance is ZERO (No free money)
+                db.collection("users").doc(currentUser.uid).set({ balance: 0, uid: currentUser.uid }, { merge: true });
+            }
+        });
+
+        // Test Money Function for Testing only
+        function addTestMoney() {
+            db.collection("users").doc(currentUser.uid).set({ 
+                balance: firebase.firestore.FieldValue.increment(1000)
+            }, { merge: true }).then(() => alert("₹1000 added for testing!"));
+        }
+
+        // --- 3. BULLETPROOF TIMER ---
+        function updateTimer() {
+            var now = new Date();
+            var totalSeconds = Math.floor(now.getTime() / 1000); 
+            var remaining = 30 - (totalSeconds % 30);
+            
+            var year = now.getFullYear();
+            var month = String(now.getMonth() + 1).padStart(2, '0');
+            var day = String(now.getDate()).padStart(2, '0');
+            var seq = ((now.getHours() * 60) + now.getMinutes()) * 2 + (now.getSeconds() >= 30 ? 2 : 1);
+            var newPeriodId = `${year}${month}${day}${String(seq).padStart(4, '0')}`;
+            
+            document.getElementById("periodId").innerText = newPeriodId;
+
+            // Generate fake history on load
+            if (currentPeriodId === "") {
+                generateFakeHistory(newPeriodId);
+            }
+
+            if (currentPeriodId !== "" && newPeriodId !== currentPeriodId) {
+                calculateResult(currentPeriodId); 
+                myCurrentBets = []; 
+            }
+            currentPeriodId = newPeriodId;
+
+            document.getElementById("sec").innerText = remaining < 10 ? "0" + remaining : remaining;
+
+            var ctrl = document.getElementById("gameControls");
+            var tBox = document.getElementById("timerBox");
+            var tick = document.getElementById("tickSound");
+
+            if(remaining <= 5) {
+                ctrl.classList.add("btn-disabled"); tBox.classList.add("timer-alert");
+                if(remaining > 0) tick.play().catch(()=>{});
+            } else {
+                ctrl.classList.remove("btn-disabled"); tBox.classList.remove("timer-alert");
+            }
+        }
+        setInterval(updateTimer, 1000);
+        updateTimer();
+
+        // --- 4. BETTING LOGIC ---
+        function openModal(id) { document.getElementById(id).style.display = "flex"; }
+        function closeAllModals() { var m = document.querySelectorAll(".modal"); for(var i=0; i<m.length; i++) m[i].style.display = "none"; }
+        function openBet(item) { selectedBet = item; document.getElementById("selectionName").innerText = item; openModal('betModal'); }
+        function setAmt(val, btn) {
+            betAmount = Number(val); 
+            var btns = document.querySelectorAll(".amt-btn");
+            for(var i=0; i<btns.length; i++) btns[i].classList.remove("active");
+            btn.classList.add("active");
+            document.getElementById("rawAmt").innerText = betAmount;
+            document.getElementById("gstAmt").innerText = (betAmount * 0.02).toFixed(2);
+            document.getElementById("finalAmt").innerText = (betAmount * 0.98).toFixed(2);
+        }
+
+        function confirmBet() {
+            if(currentBal < betAmount) return alert("Low Balance! Tap '+ Add ₹1000' to get test money.");
+            
+            myCurrentBets.push({ selection: selectedBet, amount: betAmount });
+
+            // Deduct Balance
+            db.collection("users").doc(currentUser.uid).update({ 
+                balance: firebase.firestore.FieldValue.increment(-betAmount)
+            });
+
+            // Save Bet
+            db.collection("bets").add({ 
+                uid: currentUser.uid, period: currentPeriodId, selection: selectedBet, 
+                amount: betAmount, effective: betAmount * 0.98, status: "pending", 
+                timestamp: firebase.firestore.FieldValue.serverTimestamp() 
+            });
+            closeAllModals();
+        }
+
+        // --- 5. RESULT CALCULATION (Kam Betwala Jeetega) ---
+        function calculateResult(targetPeriod) {
+            var payouts = [0,0,0,0,0,0,0,0,0,0];
+
+            myCurrentBets.forEach(function(bet) {
+                var s = bet.selection; var amt = bet.amount * 0.98;
+                for(var i=0; i<=9; i++) {
+                    var isWin = false; var mult = 0;
+                    if(s == i) { isWin=true; mult=9; }
+                    else if(s == "Big" && i>=5) { isWin=true; mult=2; }
+                    else if(s == "Small" && i<=4) { isWin=true; mult=2; }
+                    else if(s == "Green" && [1,3,7,9].includes(i)) { isWin=true; mult=2; }
+                    else if(s == "Red" && [2,4,6,8].includes(i)) { isWin=true; mult=2; }
+                    else if(s == "Violet" && (i==0||i==5)) { isWin=true; mult=4.5; }
+                    if(isWin) payouts[i] += amt * mult;
+                }
+            });
+
+            var minPayout = Math.min(...payouts);
+            var candidates = [];
+            payouts.forEach(function(pay, index) { if(pay === minPayout) candidates.push(index); });
+            var winNum = candidates[Math.floor(Math.random() * candidates.length)];
+
+            var isBig = winNum >= 5 ? "Big" : "Small";
+            var col = ([1,3,7,9].includes(winNum)) ? "Green" : "Red"; 
+            if(winNum==0) col = "Red+Violet"; if(winNum==5) col = "Green+Violet";
+            var bCol = col.includes('Green') ? '#28c76f' : (col.includes('Red') ? '#ff5050' : '#9f44d3');
+
+            // Add Result to Table
+            var row = "<tr><td>"+targetPeriod+"</td><td><span class='res-ball' style='background:"+bCol+"'>"+winNum+"</span></td><td>"+isBig+"</td><td style='color:"+bCol+"; font-weight:bold;'>"+col+"</td></tr>";
+            document.getElementById("chartBody").innerHTML = row + document.getElementById("chartBody").innerHTML;
+
+            // Process Win/Loss
+            var totalWin = 0;
+            var playedThisRound = myCurrentBets.length > 0;
+
+            db.collection("bets").where("uid", "==", currentUser.uid).where("period", "==", targetPeriod).where("status", "==", "pending").get().then(function(snap) {
+                snap.forEach(function(doc) {
+                    var b = doc.data(), won = false, mult = 0;
+                    if(b.selection == winNum) { won = true; mult = 9; }
+                    else if(b.selection == isBig) { won = true; mult = 2; }
+                    else if(col.includes(b.selection)) { won = true; mult = 2; } 
+                    
+                    if(won) {
+                        var wAmt = b.effective * mult;
+                        totalWin += wAmt;
+                        db.collection("users").doc(currentUser.uid).update({ balance: firebase.firestore.FieldValue.increment(wAmt) });
+                        db.collection("bets").doc(doc.id).update({ status: "win" });
+                    } else { 
+                        db.collection("bets").doc(doc.id).update({ status: "loss" }); 
+                    }
+                });
+
+                // Show Win Modal
+                if(playedThisRound && totalWin > 0) {
+                    document.getElementById("winAmtDisplay").innerText = "₹" + totalWin.toFixed(2);
+                    document.getElementById("winModal").style.display = "flex";
+                    document.getElementById("winSound").play().catch(()=>{});
+                } else if(playedThisRound && totalWin === 0) {
+                    // Optional: You could add a loss sound here
+                }
+            });
+            setTimeout(loadMyRecords, 1000);
+        }
+
+        function generateFakeHistory(base) {
+            var h = ""; var bp = Number(base);
+            for(var i=1; i<=8; i++) {
+                var p = bp - i; var wNum = Math.floor(Math.random() * 10);
+                var isBig = wNum >= 5 ? "Big" : "Small";
+                var col = ([1,3,7,9].includes(wNum)) ? "Green" : "Red"; 
+                if(wNum==0) col = "Red+Violet"; if(wNum==5) col = "Green+Violet";
+                var bCol = col.includes('Green') ? '#28c76f' : (col.includes('Red') ? '#ff5050' : '#9f44d3');
+                h += "<tr><td>"+p+"</td><td><span class='res-ball' style='background:"+bCol+"'>"+wNum+"</span></td><td>"+isBig+"</td><td style='color:"+bCol+"; font-weigh

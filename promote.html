@@ -1,0 +1,176 @@
+)<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Promote - RajaLuck</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --primary: #fb5b5b; --bg: #f8f9fb; --white: #fff; --orange: #ff9800; --green: #28a745; }
+        body { margin: 0; font-family: 'Segoe UI', sans-serif; background: var(--bg); padding-bottom: 100px; color: #333; }
+        
+        .header { background: var(--white); padding: 15px; text-align: center; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid #f0f0f0; }
+        .header h2 { margin: 0; font-size: 18px; font-weight: 600; }
+        .bag-icon { position: absolute; right: 20px; top: 15px; width: 25px; }
+
+        .promo-bg { background: linear-gradient(to bottom, #ff7e7e, #fb5b5b); padding: 30px 15px 60px; text-align: center; color: white; border-bottom-left-radius: 25px; border-bottom-right-radius: 25px; }
+        .promo-bg p { font-size: 11px; opacity: 0.9; margin: 10px 0; }
+        .team-title { font-size: 14px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+
+        /* 10-Box Statistics Grid */
+        .stats-grid { background: var(--white); border-radius: 15px; margin: -45px 15px 20px; display: grid; grid-template-columns: 1fr 1fr; box-shadow: 0 5px 15px rgba(0,0,0,0.06); overflow: hidden; }
+        .stat-box { padding: 18px 10px; border-right: 1px solid #f2f2f2; border-bottom: 1px solid #f2f2f2; text-align: center; position: relative; }
+        .stat-box:nth-child(2n) { border-right: none; }
+        .stat-val { font-size: 18px; font-weight: bold; margin-bottom: 5px; }
+        .stat-lbl { font-size: 10px; color: #999; line-height: 1.3; }
+        .badge { position: absolute; top: 5px; right: 5px; background: var(--orange); color: white; font-size: 8px; padding: 2px 4px; border-radius: 4px; font-weight: bold; }
+
+        .share-btn { background: linear-gradient(to right, #ff8e8e, #fb5b5b); margin: 15px; padding: 15px; border-radius: 30px; color: white; display: flex; justify-content: space-between; align-items: center; font-weight: bold; cursor: pointer; text-decoration: none; }
+        
+        .invite-card { background: var(--white); margin: 15px; padding: 15px; border-radius: 12px; }
+        .copy-box { background: #fff5f5; border: 1px solid #ffcccc; border-radius: 25px; display: flex; margin-top: 10px; overflow: hidden; }
+        .code-txt { flex: 1; padding: 12px 15px; color: var(--primary); font-weight: bold; font-size: 16px; }
+        .copy-btn { background: var(--primary); color: white; border: none; padding: 0 20px; cursor: pointer; }
+
+        .menu-list { background: var(--white); margin: 15px; border-radius: 12px; overflow: hidden; }
+        .menu-item { display: flex; align-items: center; padding: 16px 15px; border-bottom: 1px solid #f9f9f9; text-decoration: none; color: #333; }
+        .menu-item i:first-child { font-size: 20px; color: var(--primary); margin-right: 15px; }
+        .menu-item span { flex: 1; font-size: 15px; }
+        .menu-item i:last-child { color: #ccc; font-size: 14px; }
+
+        .navbar { position: fixed; bottom: 0; width: 100%; background: var(--white); display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid #eee; z-index: 1000; }
+        .nav-item { text-align: center; color: #999; text-decoration: none; font-size: 11px; flex: 1; }
+        .nav-item i { font-size: 22px; display: block; margin-bottom: 4px; }
+        .nav-item.active { color: var(--primary); }
+        .diamond-nav { background: var(--primary); width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-top: -35px; border: 5px solid var(--bg); color: white; box-shadow: 0 4px 10px rgba(251,91,91,0.3); }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h2>to promote</h2>
+        <img src="https://img.icons8.com/color/48/money-bag-euro.png" class="bag-icon" alt="money-bag">
+    </div>
+
+    <div class="promo-bg">
+        <p>Raise the level to increase commission income</p>
+        <div class="team-title"><i class="fas fa-users"></i> Number of teams/Total commission</div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-box" onclick="location.href='commission_details.html'">
+            <div class="badge">Click to View</div>
+            <div class="stat-val" style="color: var(--orange);" id="yestComm">0.00</div>
+            <div class="stat-lbl">Total commission yesterday</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-val" style="color: var(--green);" id="overallEarnings">0.00</div>
+            <div class="stat-lbl"><i class="far fa-question-circle"></i> My overall earnings</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-val" id="regCount">0</div>
+            <div class="stat-lbl">Yesterday's Registration Count</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-val" style="color: var(--green);" id="depCount">0</div>
+            <div class="stat-lbl">Downline Depositors Registered Yesterday</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-val" id="lvl1Dep">0.00</div>
+            <div class="stat-lbl">Yesterday's level 1 Deposit Amount</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-val" id="directSub">0</div>
+            <div class="stat-lbl">Total number of direct subordinates</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-val" id="teamAdd">0</div>
+            <div class="stat-lbl">Number of Team Additions Yesterday</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-val" style="color: var(--green);" id="teamDepCount">0</div>
+            <div class="stat-lbl">Yesterday's team's deposit count</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-val" id="teamDepAmt">0.00</div>
+            <div class="stat-lbl">Yesterday's team deposit amount</div>
+        </div>
+        <div class="stat-box" onclick="location.href='team_report.html'">
+            <div class="badge">Click to View</div>
+            <div class="stat-val" id="totalSub">0</div>
+            <div class="stat-lbl">Team Detail Analysis »</div>
+        </div>
+    </div>
+
+    <a href="#" class="share-btn">
+        <span>Share with a friend</span>
+        <i class="fas fa-share-nodes"></i>
+    </a>
+
+    <div class="invite-card">
+        <div style="font-size:13px; color:#666;"><i class="fas fa-qrcode" style="color:var(--primary); margin-right:5px;"></i> copy invitation code</div>
+        <div class="copy-box">
+            <div class="code-txt" id="invitation-code">Loading...</div>
+            <button class="copy-btn" onclick="copyCode()"><i class="far fa-copy"></i></button>
+        </div>
+    </div>
+
+    <div class="menu-list">
+        <a href="team_report.html" class="menu-item"><i class="fas fa-file-alt"></i><span>team report</span><i class="fas fa-chevron-right"></i></a>
+        <a href="add_subordinate.html" class="menu-item"><i class="fas fa-user-plus"></i><span>New subordinates</span><i class="fas fa-chevron-right"></i></a>
+        <a href="commission_details.html" class="menu-item"><i class="fas fa-dollar-sign"></i><span>commision detail</span><i class="fas fa-chevron-right"></i></a>
+        <a href="#" class="menu-item"><i class="fas fa-book"></i><span>invitation rules</span><i class="fas fa-chevron-right"></i></a>
+    </div>
+
+    <div class="navbar">
+        <a href="index.html" class="nav-item"><i class="fas fa-home"></i><span>front page</span></a>
+        <a href="activity.html" class="nav-item"><i class="fas fa-gift"></i><span>activity</span></a>
+        <a href="promote.html" class="nav-item active">
+            <div class="diamond-nav"><i class="fas fa-gem"></i></div>
+            <span>promote</span>
+        </a>
+        <a href="wallet.html" class="nav-item"><i class="fas fa-wallet"></i><span>wallet</span></a>
+        <a href="mine.html" class="nav-item"><i class="fas fa-user"></i><span>my</span></a>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+    <script>
+        const firebaseConfig = { apiKey: "AIzaSyA9a_UA1cbr7sx0G1lu90ig18DfEDvmvgk", projectId: "ff-warzone-9c820", authDomain: "ff-warzone-9c820.firebaseapp.com", storageBucket: "ff-warzone-9c820.firebasestorage.app", messagingSenderId: "267357764090", appId: "1:267357764090:web:0691111afd07cb0ff20c43" };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+
+        auth.onAuthStateChanged(user => {
+            if(user) {
+                db.collection("users").doc(user.uid).onSnapshot(doc => {
+                    if (doc.exists) {
+                        const data = doc.data();
+                        // Real User Data Loading
+                        document.getElementById('invitation-code').innerText = data.referralCode || "RJL" + data.uid;
+                        document.getElementById('yestComm').innerText = (data.yesterdayCommission || 0).toFixed(2);
+                        document.getElementById('overallEarnings').innerText = (data.totalCommission || 0).toFixed(2);
+                        document.getElementById('regCount').innerText = data.yesterdayRegCount || 0;
+                        document.getElementById('depCount').innerText = data.yesterdayDepCount || 0;
+                        document.getElementById('lvl1Dep').innerText = (data.lvl1DepAmount || 0).toFixed(2);
+                        document.getElementById('directSub').innerText = data.directSubordinates || 0;
+                        document.getElementById('teamAdd').innerText = data.teamAdditions || 0;
+                        document.getElementById('teamDepCount').innerText = data.teamDepCount || 0;
+                        document.getElementById('teamDepAmt').innerText = (data.teamDepAmount || 0).toFixed(2);
+                        document.getElementById('totalSub').innerText = data.totalSubordinates || 0;
+                    }
+                });
+            } else { location.href = 'login.html'; }
+        });
+
+        function copyCode() {
+            const code = document.getElementById('invitation-code').innerText;
+            navigator.clipboard.writeText(code).then(() => {
+                alert("Invitation code copied: " + code);
+            });
+        }
+    </script>
+</body>
+</html>

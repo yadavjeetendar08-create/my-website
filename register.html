@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - RajaLuck</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --primary: #ff4747; --bg: #f5f5f5; --text: #333; }
+        body { margin: 0; font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); }
+        
+        /* Header Design */
+        .header { background: linear-gradient(135deg, #ff6b6b, #ff4747); color: white; padding: 25px; padding-bottom: 90px; position: relative; overflow: hidden; }
+        .r-logo { position: absolute; right: -10px; top: 10px; font-size: 160px; opacity: 0.1; font-weight: 900; pointer-events: none; }
+        .nav-top { display: flex; justify-content: space-between; align-items: center; }
+        .header h1 { margin: 30px 0 5px 0; font-size: 26px; font-weight: 600; text-transform: capitalize; }
+        .header p { font-size: 14px; opacity: 0.9; margin-top: 5px; cursor: pointer; text-decoration: underline; }
+        
+        /* Main Content */
+        .main { background: white; margin-top: -60px; border-radius: 25px 25px 0 0; padding: 30px 20px; box-shadow: 0 -5px 15px rgba(0,0,0,0.05); min-height: 100vh; }
+        
+        .input-group { margin-bottom: 20px; }
+        .label { display: flex; align-items: center; font-size: 14px; color: #555; margin-bottom: 8px; font-weight: 500; }
+        .label i { background: var(--primary); color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 10px; font-size: 12px; }
+        
+        .box { display: flex; align-items: center; background: #fff; border: 1px solid #e0e0e0; border-radius: 12px; padding: 0 15px; transition: 0.3s; }
+        .box:focus-within { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(255, 71, 71, 0.1); }
+        .box input { flex: 1; border: none; padding: 14px 0; outline: none; background: transparent; font-size: 15px; }
+        .box i.fa-eye, .box i.fa-eye-slash { color: #999; cursor: pointer; padding: 10px; }
+        
+        /* Validation Messages */
+        .info-msg { font-size: 11px; color: #888; margin-top: 5px; margin-left: 5px; }
+        .error-text { color: red; font-size: 12px; display: none; margin-top: 5px; font-weight: bold; }
+
+        /* Checkbox */
+        .agree { display: flex; align-items: center; font-size: 13px; color: #666; margin: 25px 0; }
+        .agree input { margin-right: 10px; width: 16px; height: 16px; accent-color: var(--primary); }
+
+        /* Buttons */
+        .btn { width: 100%; padding: 15px; border-radius: 30px; border: none; font-size: 16px; font-weight: bold; cursor: pointer; margin-bottom: 15px; transition: transform 0.1s; }
+        .btn:active { transform: scale(0.98); }
+        .btn-reg { background: var(--primary); color: white; box-shadow: 0 5px 15px rgba(255, 71, 71, 0.3); }
+        .btn-reg:disabled { background: #ccc; box-shadow: none; cursor: not-allowed; }
+        .btn-log { background: white; color: var(--primary); border: 2px solid var(--primary); }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="r-logo">R</div>
+        <div class="nav-top">
+            <i class="fas fa-chevron-left" onclick="history.back()" style="font-size: 20px; cursor: pointer;"></i>
+            <span style="font-size:12px; background: rgba(255,255,255,0.2); padding: 5px 10px; border-radius: 15px;">
+                <img src="https://flagcdn.com/w20/us.png" width="15" style="vertical-align: middle;"> English
+            </span>
+        </div>
+        <h1>Create Account</h1>
+        <p onclick="location.href='login.html'">Already have an account? Log In</p>
+    </div>
+
+    <div class="main">
+        <div class="input-group">
+            <div class="label"><i class="fas fa-mobile-alt"></i> Phone Number</div>
+            <div class="box">
+                <span style="margin-right:10px; font-weight:bold; color:#555;">+91</span>
+                <input type="number" id="rMob" placeholder="Enter mobile number">
+            </div>
+            <div class="info-msg">Number cannot start with 0. Example: 9876543210</div>
+        </div>
+
+        <div class="input-group">
+            <div class="label"><i class="fas fa-lock"></i> Set Password</div>
+            <div class="box">
+                <input type="password" id="rPass" placeholder="Create a strong password">
+                <i class="far fa-eye-slash" id="togglePass1" onclick="togglePassword('rPass', 'togglePass1')"></i>
+            </div>
+            <div class="info-msg">Must be at least 8 characters long.</div>
+        </div>
+
+        <div class="input-group">
+            <div class="label"><i class="fas fa-check-circle"></i> Confirm Password</div>
+            <div class="box">
+                <input type="password" id="rCPass" placeholder="Re-enter password">
+                <i class="far fa-eye-slash" id="togglePass2" onclick="togglePassword('rCPass', 'togglePass2')"></i>
+            </div>
+            <div id="passError" class="error-text">Passwords do not match!</div>
+        </div>
+
+        <div class="input-group">
+            <div class="label"><i class="fas fa-gift"></i> Invitation Code</div>
+            <div class="box"><input type="text" id="inviteCode" placeholder="Enter invitation code (Optional)"></div>
+        </div>
+
+        <div class="agree">
+            <input type="checkbox" id="agreeCheck" checked> 
+            <span>I have read and agree to the <span style="color:var(--primary); font-weight:bold;">Privacy Agreement</span></span>
+        </div>
+
+        <button class="btn btn-reg" id="regBtn" onclick="registerUser()">Register</button>
+        <button class="btn btn-log" onclick="location.href='login.html'">I have an account</button>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+    <script>
+        // --- YOUR NEW FIREBASE CONFIG (ff-warzone-9c820) ---
+        var firebaseConfig = { 
+            apiKey: "AIzaSyA9a_UA1cbr7sx0G1lu90ig18DfEDvmvgk", 
+            authDomain: "ff-warzone-9c820.firebaseapp.com", 
+            projectId: "ff-warzone-9c820", 
+            storageBucket: "ff-warzone-9c820.firebasestorage.app", 
+            messagingSenderId: "267357764090", 
+            appId: "1:267357764090:web:0691111afd07cb0ff20c43" 
+        };
+        firebase.initializeApp(firebaseConfig);
+        var db = firebase.firestore();
+        var auth = firebase.auth();
+
+        // 1. Password Toggle
+        function togglePassword(inputId, iconId) {
+            var input = document.getElementById(inputId);
+            var icon = document.getElementById(iconId);
+            if (input.type === "password") {
+                input.type = "text";
+                icon.classList.remove("fa-eye-slash");
+                icon.classList.add("fa-eye");
+                icon.style.color = "var(--primary)";
+            } else {
+                input.type = "password";
+                icon.classList.remove("fa-eye");
+                icon.classList.add("fa-eye-slash");
+                icon.style.color = "#999";
+            }
+        }
+
+        // 2. Registration Logic
+        function registerUser() {
+            var m = document.getElementById('rMob').value;
+            var p = document.getElementById('rPass').value;
+            var cp = document.getElementById('rCPass').value;
+            var invite = document.getElementById('inviteCode').value;
+            var agree = document.getElementById('agreeCheck').checked;
+            var btn = document.getElementById('regBtn');
+            var passError = document.getElementById('passError');
+
+            // Reset Errors
+            passError.style.display = "none";
+
+            // Basic Validation
+            if (!m || !p || !cp) {
+                alert("Please fill all details");
+                return;
+            }
+            if (m.length < 10 || m.startsWith('0')) {
+                alert("Please enter a valid mobile number!");
+                return;
+            }
+            if (p.length < 8) {
+                alert("Password must be at least 8 characters!");
+                return;
+            }
+            if (p !== cp) {
+                passError.style.display = "block"; 
+                return;
+            }
+            if (!agree) {
+                alert("Please agree to the Privacy Policy");
+                return;
+            }
+
+            // Button Loading State
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            btn.disabled = true;
+
+            // Using your project ID pattern for fake email
+            var fakeEmail = m + "@warzone.com";
+
+            auth.createUserWithEmailAndPassword(fakeEmail, p).then(function(res) {
+                var uid6 = Math.floor(100000 + Math.random() * 900000); 
+                
+                // Saving to Firestore
+                db.collection("users").doc(res.user.uid).set({ 
+                    mobile: m, 
+                    balance: 0, 
+                    uid: uid6, 
+                    authID: res.user.uid,
+                    inviteCode: invite,
+                    joinDate: new Date()
+                }).then(function() {
+                    alert("✅ Account Created Successfully! Your ID: " + uid6);
+                    window.location.href = "login.html"; 
+                });
+
+            }).catch(function(e) {
+                btn.innerHTML = 'Register';
+                btn.disabled = false;
+                
+                if(e.code === "auth/email-already-in-use") {
+                    alert("This number is already registered. Please Login.");
+                } else {
+                    alert("Error: " + e.message);
+                }
+            });
+        }
+    </script>
+</body>
+</html>

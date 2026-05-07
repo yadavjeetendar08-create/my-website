@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Bank Card</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { margin: 0; font-family: sans-serif; background: #f8f9fb; }
+        .header { background: #fff; padding: 15px; display: flex; align-items: center; border-bottom: 1px solid #eee; }
+        .form-card { background: #fff; margin: 15px; padding: 20px; border-radius: 12px; }
+        .input-row { margin-bottom: 15px; }
+        .input-row label { font-size: 13px; color: #666; display: block; margin-bottom: 5px; }
+        .input-row input { width: 100%; padding: 12px; border: 1px solid #eee; border-radius: 8px; box-sizing: border-box; }
+        .save-btn { background: #fb5b5b; color: #fff; border: none; width: 100%; padding: 15px; border-radius: 30px; font-weight: bold; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="header"><i class="fas fa-chevron-left" onclick="history.back()"></i><h2 style="flex:1; text-align:center; font-size:18px; margin-right:30px;">Add Bank Card</h2></div>
+    
+    <div class="form-card">
+        <div class="input-row"><label>Full Name</label><input type="text" placeholder="As per bank record"></div>
+        <div class="input-row"><label>Bank Name</label><input type="text" placeholder="e.g. SBI, HDFC"></div>
+        <div class="input-row"><label>Account Number</label><input type="number" placeholder="Enter bank account number"></div>
+        <div class="input-row"><label>IFSC Code</label><input type="text" placeholder="Enter 11 digit IFSC"></div>
+        <div class="input-row"><label>Mobile Number</label><input type="number" placeholder="Enter linked mobile"></div>
+        <button class="save-btn" onclick="saveBank()">Save Account</button>
+    </div>
+
+    <script>
+        function saveBank() {
+            alert("Bank account saved successfully!");
+            history.back();
+        }
+    </script>
+</body>
+</html>

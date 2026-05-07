@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - RajaLuck</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --primary: #fb5b5b; --bg: #f7f8ff; --white: #fff; }
+        body { margin: 0; font-family: sans-serif; background: var(--bg); padding-bottom: 100px; }
+        .header { background: linear-gradient(to bottom, #ff7e7e, #fb5b5b); padding: 40px 20px 80px; color: white; border-bottom-left-radius: 30px; border-bottom-right-radius: 30px; }
+        .user-profile { display: flex; align-items: center; gap: 15px; }
+        .avatar { width: 65px; height: 65px; border-radius: 50%; border: 3px solid rgba(255,255,255,0.3); background: #fff; }
+        .uid-box { background: rgba(255,255,255,0.2); padding: 3px 10px; border-radius: 15px; font-size: 11px; margin-top: 5px; display: inline-flex; align-items: center; gap: 5px; }
+        .balance-card { background: var(--white); border-radius: 15px; margin: -50px 15px 15px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .bal-amount { font-size: 26px; font-weight: bold; }
+        .feature-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 15px 15px; }
+        .feature-item { background: white; padding: 15px; border-radius: 12px; display: flex; align-items: center; gap: 12px; text-decoration: none; color: #333; font-weight: bold; }
+        .feature-item i { font-size: 22px; color: var(--primary); }
+        .navbar { position: fixed; bottom: 0; width: 100%; background: #fff; display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid #eee; z-index: 1000; }
+        .nav-item { text-align: center; color: #999; text-decoration: none; font-size: 11px; flex: 1; }
+        .nav-item.active { color: var(--primary); }
+        .nav-item i { font-size: 22px; display: block; margin-bottom: 3px; }
+        .diamond-nav { background: var(--primary); width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-top: -30px; border: 4px solid var(--bg); color: white; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="user-profile">
+            <img src="https://img.icons8.com/bubbles/100/user.png" class="avatar">
+            <div><h2>MEMBERNNGNCSVB</h2><div class="uid-box">UID | 3571806 <i class="far fa-copy"></i></div></div>
+        </div>
+    </div>
+
+    <div class="balance-card">
+        <div style="font-size:12px; color:#999;">balance</div>
+        <div class="bal-amount">₹0.00</div>
+    </div>
+
+    <div class="feature-grid">
+        <a href="bet_history.html" class="feature-item"><i class="fas fa-list-alt"></i><span>place a bet</span></a>
+        <a href="deposit_record.html" class="feature-item"><i class="fas fa-file-invoice"></i><span>Deposit</span></a>
+        <a href="withdraw_record.html" class="feature-item"><i class="fas fa-history"></i><span>Withdraw</span></a>
+    </div>
+
+    <div class="navbar">
+        <a href="index.html" class="nav-item"><i class="fas fa-home"></i><span>front page</span></a>
+        <a href="activity.html" class="nav-item"><i class="fas fa-gift"></i><span>activity</span></a>
+        <a href="promote.html" class="nav-item"><div class="diamond-nav"><i class="fas fa-gem"></i></div><span>promote</span></a>
+        <a href="wallet.html" class="nav-item"><i class="fas fa-wallet"></i><span>wallet</span></a>
+        <a href="my.html" class="nav-item active"><i class="fas fa-user"></i><span>my</span></a>
+    </div>
+
+</body>
+</html>

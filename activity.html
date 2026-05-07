@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RajaLuck - Activity</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --primary: #ff6b6b; --bg: #f8f9fb; --white: #ffffff; }
+        body { margin: 0; font-family: 'Segoe UI', sans-serif; background: var(--bg); padding-bottom: 80px; }
+        
+        /* Header Section from Screenshot */
+        .header { background: var(--primary); color: white; padding: 20px 15px; text-align: center; position: relative; }
+        .header h2 { margin: 0; font-size: 20px; letter-spacing: 1px; }
+        .user-icon { position: absolute; right: 15px; top: 20px; font-size: 20px; }
+        .header-text { text-align: left; padding: 15px; font-size: 13px; line-height: 1.5; }
+        .header-text i { margin-right: 5px; }
+
+        /* Activity Grid Layout */
+        .activity-container { padding: 0 10px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .activity-card { 
+            background: var(--white); border-radius: 12px; overflow: hidden; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05); display: flex; flex-direction: column;
+            cursor: pointer; transition: 0.3s;
+        }
+        .activity-card:active { transform: scale(0.95); }
+        .activity-card img { width: 100%; height: 110px; object-fit: cover; }
+        .card-title { padding: 10px; font-size: 13px; font-weight: bold; text-align: center; color: #333; flex: 1; }
+
+        /* Big Horizontal Card (Turnover Salary) */
+        .horizontal-card { grid-column: span 2; display: flex; flex-direction: column; background: var(--white); border-radius: 12px; margin-top: 10px; overflow: hidden; }
+        .h-content { padding: 15px; }
+        .h-content h3 { margin: 0; font-size: 15px; }
+        .h-content p { font-size: 12px; color: #777; margin: 5px 0 0 0; }
+        .btn-share { 
+            background: var(--primary); color: white; border: none; padding: 10px; 
+            border-radius: 20px; margin: 10px 15px; font-weight: bold; cursor: pointer;
+        }
+
+        /* Bottom Navbar (Linked with index) */
+        .navbar { position: fixed; bottom: 0; width: 100%; background: var(--white); display: flex; justify-content: space-around; padding: 12px 0; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); }
+        .nav-item { text-align: center; color: #999; text-decoration: none; font-size: 11px; flex: 1; }
+        .nav-item i { font-size: 22px; display: block; margin-bottom: 3px; }
+        .nav-item.active { color: var(--primary); }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="user-icon"><i class="fas fa-user-circle"></i></div>
+        <h2>RAJA LUCK</h2>
+    </div>
+
+    <div class="header" style="background: var(--primary); padding: 0 15px 15px;">
+        <div class="header-text" style="background: rgba(255,255,255,0.1); border-radius: 10px; padding: 10px;">
+            <p style="margin: 0;"><i class="fas fa-star"></i> Don't forget to regularly check the activity page.</p>
+            <p style="margin: 5px 0 0 0;"><i class="fas fa-star"></i> We will frequently introduce reward activities for all users.</p>
+        </div>
+    </div>
+
+    <div class="activity-container" style="margin-top: 15px;">
+        <div class="activity-card" onclick="alert('Opening Invitation Details...')">
+            <img src="https://img.icons8.com/color/256/add-user-group-man-man.png">
+            <div class="card-title">Invitation Bonus</div>
+        </div>
+
+        <div class="activity-card">
+            <img src="https://img.icons8.com/color/256/mystery-box.png">
+            <div class="card-title">Daily mystery rewards</div>
+        </div>
+
+        <div class="activity-card" onclick="alert('Min Deposit: ₹100')">
+            <img src="https://img.icons8.com/color/256/safe.png">
+            <div class="card-title">First Deposit Bonus</div>
+        </div>
+
+        <div class="horizontal-card">
+            <img src="https://img.icons8.com/color/512/conference.png" style="height: 150px; object-fit: cover;">
+            <div class="h-content">
+                <h3>Team levels 1 to 3 WinGo turnover salary</h3>
+                <p>Downline 3 levels, the turnover in WinGo games all count towards your team's turnover.</p>
+            </div>
+        </div>
+
+        <div class="horizontal-card" style="margin-top: 15px; margin-bottom: 20px;">
+            <img src="https://img.icons8.com/color/512/gift.png" style="height: 150px; object-fit: cover;">
+            <div class="h-content">
+                <h3>Congratulations on Receiving the Code</h3>
+                <p>This bonus can only be claimed by your subordinates, and each member can claim it only once.</p>
+            </div>
+            <button class="btn-share">Share with Friends</button>
+        </div>
+    </div>
+
+    <div class="navbar">
+        <a href="index.html" class="nav-item"><i class="fas fa-home"></i><span>front page</span></a>
+        <a href="activity.html" class="nav-item active"><i class="fas fa-gift"></i><span>activity</span></a>
+        <a href="promote.html" class="nav-item" style="margin-top: -25px;"><div style="background:var(--primary); width: 50px; height:50px; border-radius:50%; display:flex; align-items:center; justify-content:center; border: 5px solid var(--bg); color:white;"><i class="fas fa-gem"></i></div><span>promote</span></a>
+        <a href="wallet.html" class="nav-item"><i class="fas fa-wallet"></i><span>wallet</span></a>
+        <a href="mine.html" class="nav-item"><i class="fas fa-user"></i><span>my</span></a>
+    </div>
+
+</body>
+</html>

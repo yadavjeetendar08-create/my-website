@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Subordinate</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #ff5e5e;
+            --text-color: #333;
+            --bg-color: #f5f5f5;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+        .header {
+            background: white;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #eee;
+        }
+        .back-btn {
+            font-size: 20px;
+            color: var(--text-color);
+            text-decoration: none;
+            margin-right: 20px;
+        }
+        .header-title {
+            font-size: 18px;
+            font-weight: bold;
+            flex-grow: 1;
+            text-align: center;
+            margin-right: 30px;
+        }
+        .tabs {
+            display: flex;
+            background: white;
+            border-bottom: 1px solid #eee;
+        }
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 15px;
+            font-size: 14px;
+            color: #666;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+        }
+        .tab.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+        .content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 60vh;
+            color: #999;
+        }
+        .no-data-img {
+            width: 150px;
+            margin-bottom: 20px;
+            /* You would replace this with your actual image path */
+            background-image: url('https://cdni.iconscout.com/illustration/premium/thumb/no-data-found-illustration-download-in-svg-png-gif-file-formats--missing-error-business-pack-illustrations-4790622.png?f=webp');
+            height: 150px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="promote.html" class="back-btn"><i class="fas fa-chevron-left"></i></a>
+        <div class="header-title">Add Subordinate</div>
+    </div>
+
+    <div class="tabs">
+        <div class="tab active" onclick="switchTab(this, 'today')">Today</div>
+        <div class="tab" onclick="switchTab(this, 'yesterday')">Yesterday</div>
+        <div class="tab" onclick="switchTab(this, 'this_month')">This Month</div>
+    </div>
+
+    <div class="content" id="content-area">
+        <div class="no-data-img"></div>
+        <div>No data</div>
+    </div>
+
+    <script>
+        function switchTab(element, period) {
+            // Update active tab
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            element.classList.add('active');
+
+            // For now, we just show "No data" for all tabs.
+            // In a real app, you would fetch data for the selected period.
+            const contentArea = document.getElementById('content-area');
+            contentArea.innerHTML = `
+                <div class="no-data-img"></div>
+                <div>No data for ${period}</div>
+            `;
+        }
+    </script>
+</body>
+</html>

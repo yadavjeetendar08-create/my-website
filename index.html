@@ -1,390 +1,241 @@
-<!
-</html><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Chicken Road Pro</title>
+    <title>RAJA LUCK</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        /* --- APP STYLE --- */
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #121212;
-            color: white;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            overflow: hidden; /* No scroll bars */
-            touch-action: none; /* Mobile touch fix */
+        /* 1. Basic Settings */
+        :root {
+            --primary: #fa5555;
+            --bg: #f7f8ff;
+            --text: #333;
+        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { margin: 0; font-family: 'Segoe UI', sans-serif; background: var(--bg); padding-bottom: 80px; }
+
+        /* 2. Header */
+        .header { 
+            background: white; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; 
+            position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .logo-box { display: flex; align-items: center; gap: 5px; }
+        .logo-text { color: #d99c56; font-size: 20px; font-weight: bold; font-family: serif; letter-spacing: 1px; }
+        .crown-icon { color: #d99c56; font-size: 18px; }
+
+        /* 3. Banner */
+        .banner-container { padding: 15px; }
+        .banner { 
+            width: 100%; height: 180px; border-radius: 15px; overflow: hidden; 
+            box-shadow: 0 5px 15px rgba(250, 85, 85, 0.3);
+        }
+        .banner img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+        /* 4. Marquee Notice */
+        .notice-bar { 
+            background: white; margin: 0 15px 15px 15px; padding: 8px 10px; border-radius: 20px; 
+            display: flex; align-items: center; gap: 10px; font-size: 12px; color: #555;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
 
-        /* --- HEADER (Wallet) --- */
-        .header {
-            background: linear-gradient(90deg, #1e3c72, #2a5298);
-            padding: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-            height: 60px;
-            box-sizing: border-box;
+        /* 5. Section Titles */
+        .section-header { 
+            display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; 
         }
-        .app-name { font-weight: bold; font-size: 18px; color: #ffeb3b; }
-        .wallet { 
-            background: rgba(0,0,0,0.3); 
-            padding: 5px 15px; 
-            border-radius: 20px; 
-            border: 1px solid #4caf50;
-            font-size: 16px;
+        .sec-title { 
+            font-size: 18px; font-weight: 800; color: #333; display: flex; align-items: center; gap: 8px; 
         }
+        .sec-title::before { content: ''; width: 4px; height: 20px; background: var(--primary); border-radius: 5px; }
 
-        /* --- GAME AREA --- */
-        #game-wrapper {
-            position: relative;
-            width: 100vw;
-            height: calc(100vh - 200px); /* Space for header and controls */
-            background: #81C784; /* Grass color */
-            overflow: hidden;
+        /* --- LOTTERY CARDS --- */
+        .lottery-list { padding: 0 15px; display: flex; flex-direction: column; gap: 12px; }
+        .lot-card { 
+            height: 110px; border-radius: 15px; padding: 15px; color: white; position: relative; overflow: hidden; 
+            display: flex; justify-content: space-between; align-items: center; cursor: pointer;
+            box-shadow: 0 4px 10px rgba(255, 100, 100, 0.2); transition: transform 0.1s;
         }
-        canvas {
-            display: block;
-            width: 100%;
-            height: 100%;
-        }
+        .lot-card:active { transform: scale(0.98); }
+        
+        .bg-win { background: linear-gradient(135deg, #ff6b6b, #ff4747); } 
+        .bg-trx { background: linear-gradient(135deg, #a18cd1, #fbc2eb); } 
+        .bg-5d { background: linear-gradient(135deg, #84fab0, #8fd3f4); }
+        
+        .lot-info h3 { margin: 0; font-size: 22px; font-weight: 800; }
+        .lot-info p { margin: 5px 0 0; font-size: 11px; opacity: 0.9; }
+        .lot-img { width: 90px; position: absolute; right: 5px; bottom: 5px; filter: drop-shadow(0 5px 5px rgba(0,0,0,0.2)); }
 
-        /* --- CONTROLS --- */
-        .controls {
-            height: 140px;
-            background: #222;
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 10px;
-            padding: 10px;
-            box-sizing: border-box;
+        /* --- 24 GAMES GRID --- */
+        .grid-container { 
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 15px 30px 15px; 
         }
-        .btn {
-            border: none;
-            border-radius: 10px;
-            font-weight: bold;
-            font-size: 14px;
-            color: white;
-            cursor: pointer;
-            active: scale(0.95);
+        .game-box { 
+            background: white; border-radius: 12px; padding: 10px; text-align: center; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05); display: flex; flex-direction: column; align-items: center;
+            cursor: pointer; transition: transform 0.1s;
         }
-        .btn-move {
-            grid-column: 1 / 4; /* Full width */
-            background: #ff9800;
-            font-size: 20px;
-            box-shadow: 0 4px #e65100;
-        }
-        .btn-move:active { box-shadow: 0 0 #e65100; transform: translateY(4px); }
-        .btn-dep { background: #4caf50; }
-        .btn-wit { background: #f44336; }
-        .btn-adm { background: #607d8b; }
+        .game-box:active { transform: scale(0.95); }
+        .game-box img { width: 50px; height: 50px; margin-bottom: 5px; object-fit: contain; }
+        .game-box span { font-size: 11px; font-weight: 700; color: #444; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        /* --- MODALS (Popups) --- */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85);
-            z-index: 100;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
+        /* 6. FLAT BOTTOM NAVIGATION */
+        .navbar { 
+            position: fixed; bottom: 0; left: 0; width: 100%; background: white; height: 60px;
+            display: flex; justify-content: space-around; align-items: center; 
+            border-top: 1px solid #eee; z-index: 1000;
         }
-        .modal-box {
-            background: #333;
-            padding: 20px;
-            border-radius: 15px;
-            width: 80%;
-            text-align: center;
-            border: 1px solid gold;
+        .nav-item { 
+            flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            font-size: 10px; color: #999; gap: 4px; cursor: pointer; text-decoration: none; height: 100%;
         }
-        input {
-            width: 80%; padding: 10px; margin: 10px 0;
-            border-radius: 5px; border: none; font-size: 16px;
-        }
-        .close-btn {
-            margin-top: 10px; background: transparent; color: #aaa; border: 1px solid #aaa;
-        }
+        .nav-item.active { color: var(--primary); font-weight: bold; }
+        .nav-item i { font-size: 20px; }
+        .nav-item .fa-gem { color: #999; } 
+        .nav-item.active .fa-gem { color: var(--primary); }
 
-        /* Message Overlay */
-        #msg-overlay {
-            position: absolute;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0,0,0,0.7);
-            color: white;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-            display: none;
-            pointer-events: none;
-        }
     </style>
 </head>
 <body>
 
-    <!-- Header -->
     <div class="header">
-        <div class="app-name">🐔 Chicken Road</div>
-        <div class="wallet">💰 ₹<span id="bal">0</span></div>
+        <div class="logo-box">
+            <i class="fas fa-crown crown-icon"></i>
+            <span class="logo-text">RAJA LUCK</span>
+        </div>
+        <i class="fas fa-download" style="font-size: 20px; color: #ccc;"></i>
     </div>
 
-    <!-- Game Canvas -->
-    <div id="game-wrapper">
-        <canvas id="gameCanvas"></canvas>
-        <div id="msg-overlay">TAP 'JUMP' TO START<br>Cost: ₹10</div>
-    </div>
-
-    <!-- Bottom Controls -->
-    <div class="controls">
-        <button class="btn btn-move" onclick="playerJump()" id="jumpBtn">JUMP (⬆️)</button>
-        <button class="btn btn-dep" onclick="showModal('deposit')">Add Cash</button>
-        <button class="btn btn-wit" onclick="showModal('withdraw')">Withdraw</button>
-        <button class="btn btn-adm" onclick="toggleAdmin()">Admin</button>
-    </div>
-
-    <!-- Deposit/Withdraw Modal -->
-    <div id="modal-payment" class="modal">
-        <div class="modal-box">
-            <h2 id="modal-title">Deposit</h2>
-            <p>Enter Amount (Fake System)</p>
-            <input type="number" id="amount" placeholder="₹ 100">
-            <button class="btn btn-dep" style="width:100%; padding:10px;" onclick="handleTransaction()">Confirm</button>
-            <button class="btn close-btn" onclick="closeModal()">Close</button>
+    <div class="banner-container">
+        <div class="banner">
+            <img src="https://img.freepik.com/free-vector/winning-streak-casino-banner_23-2149503692.jpg" alt="Banner">
         </div>
     </div>
 
-    <!-- Admin Panel -->
-    <div id="admin-panel" class="modal">
-        <div class="modal-box" style="border-color: red;">
-            <h2 style="color:red;">👮 Admin Panel</h2>
-            <p>User ID: 8823 (Demo)</p>
-            <button class="btn btn-dep" onclick="adminSetBal(1000)">Give ₹1000</button>
-            <button class="btn btn-wit" onclick="adminSetBal(0)">Reset to ₹0</button>
-            <br><br>
-            <button class="btn close-btn" onclick="document.getElementById('admin-panel').style.display='none'">Close Panel</button>
+    <div class="notice-bar">
+        <i class="fas fa-volume-up" style="color:var(--primary)"></i>
+        <marquee>Winning Streak Bonus! Join Raja Luck and win up to ₹21,888. New Games Added!</marquee>
+    </div>
+
+    <div class="section-header">
+        <div class="sec-title">Lottery</div>
+    </div>
+    <div class="lottery-list">
+        <div class="lot-card bg-win" onclick="location.href='bingo.html'">
+            <div class="lot-info"><h3>Win Go</h3><p>Guess Green/Red</p></div>
+            <img src="https://img.icons8.com/3d-fluency/94/roulette.png" class="lot-img">
+        </div>
+        <div class="lot-card bg-trx" onclick="alert('Coming Soon')">
+            <div class="lot-info"><h3>TRX Win</h3><p>Blockchain Hash</p></div>
+            <img src="https://img.icons8.com/3d-fluency/94/bitcoin.png" class="lot-img">
+        </div>
+        <div class="lot-card bg-5d" onclick="alert('Coming Soon')">
+            <div class="lot-info"><h3>5D Lotre</h3><p>High/Low/Odd</p></div>
+            <img src="https://img.icons8.com/3d-fluency/94/billiards.png" class="lot-img">
         </div>
     </div>
+
+    <div class="section-header" style="margin-top: 20px;">
+        <div class="sec-title">All Games</div>
+    </div>
+    
+    <div class="grid-container" id="allGamesGrid">
+    </div>
+
+    <div class="navbar">
+        <a href="#" class="nav-item active">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+        </a>
+        <a href="activity.html" class="nav-item">
+            <i class="fas fa-gift"></i>
+            <span>Activity</span>
+        </a>
+        <a href="promote.html" class="nav-item">
+            <i class="fas fa-gem"></i>
+            <span>Promote</span>
+        </a>
+        <a href="wallet.html" class="nav-item">
+            <i class="fas fa-wallet"></i>
+            <span>Wallet</span>
+        </a>
+        <a href="my.html" class="nav-item">
+            <i class="fas fa-user-circle"></i>
+            <span>My</span>
+        </a>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
 
     <script>
-        // --- VARIABLES ---
-        let balance = 100; // Starting Fake Money
-        const entryFee = 10;
-        const winPrize = 20;
+        // 1. Firebase Config (Auth Check)
+        const firebaseConfig = { 
+            apiKey: "AIzaSyA9a_UA1cbr7sx0G1lu90ig18DfEDvmvgk", 
+            authDomain: "ff-warzone-9c820.firebaseapp.com", 
+            projectId: "ff-warzone-9c820", 
+            storageBucket: "ff-warzone-9c820.firebasestorage.app", 
+            messagingSenderId: "267357764090", 
+            appId: "1:267357764090:web:0691111afd07cb0ff20c43" 
+        };
+        firebase.initializeApp(firebaseConfig);
+
+        firebase.auth().onAuthStateChanged((user) => {
+            if (!user) {
+                // If not logged in, redirect to Login
+                window.location.href = "login.html";
+            }
+        });
+
+        // 2. Games List Logic
+        const gamesList = [
+            // Row 1
+            { name: "Aviator", img: "https://img.icons8.com/3d-fluency/94/rocket.png", url: "aviator.html" },
+            { name: "Mines", img: "https://img.icons8.com/3d-fluency/94/bomb.png", url: "mines.html" },
+            { name: "Chicken", img: "https://img.icons8.com/3d-fluency/94/chicken.png", url: "chicken.html" },
+            // Row 2
+            { name: "Dragon Tiger", img: "https://img.icons8.com/3d-fluency/94/dragon.png", url: "dt.html" },
+            { name: "Ludo", img: "https://img.icons8.com/3d-fluency/94/ludo.png", url: "ludo.html" },
+            { name: "Cricket", img: "https://img.icons8.com/3d-fluency/94/cricket-ball.png", url: "cricket.html" },
+            // Row 3
+            { name: "Plinko", img: "https://img.icons8.com/3d-fluency/94/bowling.png", url: "plinko.html" },
+            { name: "Slots 777", img: "https://img.icons8.com/3d-fluency/94/slot-machine.png", url: "slots.html" },
+            { name: "Poker", img: "https://img.icons8.com/3d-fluency/94/playing-cards.png", url: "poker.html" },
+            // Row 4
+            { name: "Car Race", img: "https://img.icons8.com/3d-fluency/94/f1-car.png", url: "race.html" },
+            { name: "Football", img: "https://img.icons8.com/3d-fluency/94/soccer-ball.png", url: "football.html" },
+            { name: "Rummy", img: "https://img.icons8.com/3d-fluency/94/ace-of-hearts.png", url: "rummy.html" },
+            // Row 5
+            { name: "Teen Patti", img: "https://img.icons8.com/3d-fluency/94/diamonds-card.png", url: "teenpatti.html" },
+            { name: "Andar Bahar", img: "https://img.icons8.com/3d-fluency/94/card-exchange.png", url: "ab.html" },
+            { name: "Limbo", img: "https://img.icons8.com/3d-fluency/94/start.png", url: "limbo.html" },
+            // Row 6
+            { name: "Crash", img: "https://img.icons8.com/3d-fluency/94/collision.png", url: "crash.html" },
+            { name: "Dice", img: "https://img.icons8.com/3d-fluency/94/dice.png", url: "dice.html" },
+            { name: "Fishing", img: "https://img.icons8.com/3d-fluency/94/fishing-pole.png", url: "fish.html" },
+            // Row 7
+            { name: "K3", img: "https://img.icons8.com/3d-fluency/94/rubiks-cube.png", url: "k3.html" },
+            { name: "Blackjack", img: "https://img.icons8.com/3d-fluency/94/clubs-card.png", url: "blackjack.html" },
+            { name: "Roulette", img: "https://img.icons8.com/3d-fluency/94/roulette.png", url: "roulette.html" },
+             // Row 8
+            { name: "Candy", img: "https://img.icons8.com/3d-fluency/94/candy.png", url: "candy.html" },
+            { name: "Forest", img: "https://img.icons8.com/3d-fluency/94/forest.png", url: "forest.html" },
+            { name: "Wheel", img: "https://img.icons8.com/3d-fluency/94/steering-wheel.png", url: "wheel.html" }
+        ];
+
+        const grid = document.getElementById('allGamesGrid');
         
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
-        let gameRunning = false;
-        let animationId;
-
-        // Mobile Responsive Size
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight - 200; 
-
-        // Game Objects
-        const laneHeight = 60;
-        let player = { x: canvas.width/2, y: 0, size: 30, emoji: '🐔' };
-        let cars = [];
-        let lanes = [];
-
-        // --- WALLET FUNCTIONS ---
-        function updateUI() {
-            document.getElementById('bal').innerText = balance;
-        }
-        updateUI();
-
-        let currentTransType = '';
-        function showModal(type) {
-            currentTransType = type;
-            document.getElementById('modal-payment').style.display = 'flex';
-            document.getElementById('modal-title').innerText = type === 'deposit' ? 'Add Money' : 'Withdraw Money';
-        }
-        function closeModal() {
-            document.getElementById('modal-payment').style.display = 'none';
-        }
-        function handleTransaction() {
-            const amt = parseInt(document.getElementById('amount').value);
-            if(!amt || amt < 1) { alert("Invalid Amount"); return; }
-            
-            if(currentTransType === 'deposit') {
-                balance += amt;
-                alert("Success! ₹" + amt + " added.");
-            } else {
-                if(balance >= amt) {
-                    balance -= amt;
-                    alert("Withdrawal Request Sent for ₹" + amt);
-                } else {
-                    alert("Insufficient Balance!");
-                }
-            }
-            updateUI();
-            closeModal();
-        }
-
-        // --- GAME LOGIC ---
-        function initGame() {
-            // Reset Player
-            player.y = canvas.height - 40;
-            player.x = canvas.width / 2;
-            
-            // Create Lanes
-            lanes = [];
-            cars = [];
-            const totalLanes = Math.floor(canvas.height / laneHeight);
-            
-            for(let i=0; i<totalLanes; i++) {
-                let y = canvas.height - ((i+1) * laneHeight);
-                let isRoad = i > 0 && i < totalLanes-1; // Top and bottom are safe grass
-                
-                lanes.push({ y: y, isRoad: isRoad });
-
-                if(isRoad) {
-                    // Add cars to this lane
-                    let speed = (Math.random() * 2 + 2) * (Math.random() > 0.5 ? 1 : -1);
-                    let carEmoji = ['🚘', '🚕', '🚓', '🚚'][Math.floor(Math.random()*4)];
-                    
-                    // Add 2 cars per lane
-                    cars.push({ x: Math.random() * canvas.width, y: y + 15, w: 40, h: 30, s: speed, img: carEmoji });
-                    cars.push({ x: Math.random() * canvas.width + 200, y: y + 15, w: 40, h: 30, s: speed, img: carEmoji });
-                }
-            }
-            draw();
-            document.getElementById('msg-overlay').style.display = 'block';
-        }
-
-        function playerJump() {
-            if(!gameRunning) {
-                // Try to start game
-                if(balance >= entryFee) {
-                    balance -= entryFee;
-                    updateUI();
-                    gameRunning = true;
-                    document.getElementById('msg-overlay').style.display = 'none';
-                    gameLoop();
-                } else {
-                    alert("Low Balance! Please Deposit.");
-                    showModal('deposit');
-                }
-                return;
-            }
-
-            // Move Player
-            player.y -= laneHeight;
-            
-            // Check Win
-            if(player.y < 0) {
-                gameOver(true);
-            }
-        }
-
-        function update() {
-            // Move Cars
-            cars.forEach(car => {
-                car.x += car.s;
-                // Loop cars around screen
-                if(car.s > 0 && car.x > canvas.width) car.x = -50;
-                if(car.s < 0 && car.x < -50) car.x = canvas.width;
-
-                // Collision Detection
-                // Simple box collision
-                let px = player.x - 15; // Centering adjustment
-                let py = player.y;
-                
-                if (
-                    px < car.x + car.w &&
-                    px + 30 > car.x &&
-                    py < car.y + car.h &&
-                    py + 30 > car.y
-                ) {
-                    gameOver(false);
-                }
-            });
-        }
-
-        function draw() {
-            // Clear Screen
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            // Draw Lanes
-            lanes.forEach(lane => {
-                ctx.fillStyle = lane.isRoad ? "#444" : "#81C784";
-                ctx.fillRect(0, lane.y, canvas.width, laneHeight);
-                
-                // Road markings
-                if(lane.isRoad) {
-                    ctx.strokeStyle = "#FFF";
-                    ctx.setLineDash([20, 20]);
-                    ctx.beginPath();
-                    ctx.moveTo(0, lane.y + laneHeight/2);
-                    ctx.lineTo(canvas.width, lane.y + laneHeight/2);
-                    ctx.stroke();
-                }
-            });
-
-            // Draw Cars
-            ctx.font = "30px Arial";
-            cars.forEach(car => {
-                // Flip car if moving left
-                ctx.save();
-                if(car.s < 0) {
-                    ctx.scale(-1, 1);
-                    ctx.fillText(car.img, -car.x - 40, car.y + 25);
-                } else {
-                    ctx.fillText(car.img, car.x, car.y + 25);
-                }
-                ctx.restore();
-            });
-
-            // Draw Player
-            ctx.fillText(player.emoji, player.x - 15, player.y + 40);
-        }
-
-        function gameLoop() {
-            if(!gameRunning) return;
-            update();
-            draw();
-            animationId = requestAnimationFrame(gameLoop);
-        }
-
-        function gameOver(win) {
-            gameRunning = false;
-            cancelAnimationFrame(animationId);
-            
-            let msg = document.getElementById('msg-overlay');
-            msg.style.display = 'block';
-            
-            if(win) {
-                balance += winPrize;
-                msg.innerHTML = "🏆 YOU WON! <br> +₹20 Added";
-                updateUI();
-            } else {
-                msg.innerHTML = "💥 CRASHED! <br> Try Again (-₹10)";
-                // Shake effect
-                canvas.style.transform = "translate(5px, 5px)";
-                setTimeout(() => canvas.style.transform = "none", 200);
-            }
-            
-            setTimeout(() => {
-                initGame();
-                msg.innerHTML = "TAP 'JUMP' TO START<br>Cost: ₹10";
-            }, 2000);
-        }
-
-        // --- ADMIN ---
-        function toggleAdmin() {
-            document.getElementById('admin-panel').style.display = 'flex';
-        }
-        function adminSetBal(val) {
-            balance = val;
-            updateUI();
-            alert("Admin Balance Updated!");
-        }
-
-        // Initialize First Time
-        initGame();
-
+        gamesList.forEach(game => {
+            const div = document.createElement('div');
+            div.className = 'game-box';
+            div.onclick = () => { 
+                // Placeholder Alert for unmade games
+                if(game.url === 'wingo.html') location.href = 'bingo.html';
+                else alert(game.name + " is coming soon!"); 
+            };
+            div.innerHTML = `<img src="${game.img}"><span>${game.name}</span>`;
+            grid.appendChild(div);
+        });
     </script>
 </body>
 </html>

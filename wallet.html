@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wallet - RajaLuck</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --primary: #fb5b5b; --bg: #f8f9fb; --white: #fff; --text-gray: #999; }
+        body { margin: 0; font-family: 'Segoe UI', sans-serif; background: var(--bg); padding-bottom: 100px; color: #333; }
+        
+        /* Red Header Section */
+        .wallet-header { 
+            background: linear-gradient(to bottom, #ff7e7e, #fb5b5b); 
+            padding: 20px 15px 80px; text-align: center; color: white; 
+            border-bottom-left-radius: 25px; border-bottom-right-radius: 25px;
+            position: relative;
+        }
+        .header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; }
+        .header-top i { font-size: 20px; cursor: pointer; }
+        .balance-main { font-size: 28px; font-weight: bold; margin: 10px 0 5px; }
+        .balance-lbl { font-size: 13px; opacity: 0.9; }
+
+        /* Main Wallet Card */
+        .wallet-card { 
+            background: var(--white); border-radius: 15px; margin: -60px 15px 15px; 
+            padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.06); text-align: center;
+        }
+        .wallet-stats { display: flex; justify-content: space-around; margin-bottom: 20px; }
+        .stat-circle { position: relative; width: 100px; height: 100px; display: flex; align-items: center; justify-content: center; }
+        .stat-circle svg { position: absolute; width: 100%; height: 100%; transform: rotate(-90deg); }
+        .stat-val { font-weight: bold; color: #333; margin-top: 3px; font-size: 16px; }
+        .stat-info { font-size: 12px; color: var(--text-gray); margin-top: 5px; }
+
+        .recycle-btn { 
+            background: var(--primary); color: white; border: none; width: 100%; 
+            padding: 12px; border-radius: 30px; font-weight: bold; font-size: 15px; cursor: pointer;
+        }
+
+        /* 🔥 Action Menu: Functional Buttons */
+        .action-menu { 
+            display: grid; grid-template-columns: repeat(4, 1fr); 
+            background: white; margin: 15px; padding: 20px 10px; border-radius: 12px;
+        }
+        .action-item { text-align: center; font-size: 11px; color: #666; cursor: pointer; text-decoration: none; }
+        .action-item i { 
+            display: block; width: 45px; height: 45px; margin: 0 auto 8px;
+            background: #fff5f5; color: var(--primary); border-radius: 12px;
+            line-height: 45px; font-size: 20px;
+        }
+
+        /* Provider Grid */
+        .grid-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 15px; }
+        .grid-item { 
+            background: white; padding: 15px 5px; border-radius: 10px; text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.03); border: 1px solid #f0f0f0;
+        }
+        .grid-item.active { background: linear-gradient(to bottom, #ff7e7e, #fb5b5b); color: white; }
+        .grid-val { font-size: 13px; font-weight: bold; margin-bottom: 5px; }
+        .grid-name { font-size: 11px; font-weight: 500; }
+
+        /* Bottom Navbar */
+        .navbar { position: fixed; bottom: 0; width: 100%; background: var(--white); display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid #eee; z-index: 100; }
+        .nav-item { text-align: center; color: #999; text-decoration: none; font-size: 11px; flex: 1; }
+        .nav-item.active { color: var(--primary); }
+        .nav-item i { font-size: 22px; display: block; margin-bottom: 3px; }
+    </style>
+</head>
+<body>
+
+    <div class="wallet-header">
+        <div class="header-top">
+            <i class="fas fa-chevron-left" onclick="history.back()"></i>
+            <span style="font-size: 18px; font-weight: 600;">wallet</span>
+            <i class="fas fa-sync-alt" onclick="location.reload()" style="font-size: 16px;"></i>
+        </div>
+        <div class="balance-main">₹0.00</div>
+        <div class="balance-lbl">balance</div>
+    </div>
+
+    <div class="wallet-card">
+        <div class="wallet-stats">
+            <div>
+                <div class="stat-circle">
+                    <svg viewBox="0 0 36 36"><path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#eee" stroke-width="2"/></svg>
+                    <b style="font-size: 14px;">0%</b>
+                </div>
+                <div class="stat-val">₹0.00</div>
+                <div class="stat-info">main wallet</div>
+            </div>
+            <div>
+                <div class="stat-circle">
+                    <svg viewBox="0 0 36 36"><path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#eee" stroke-width="2"/></svg>
+                    <b style="font-size: 14px; color: #999;">0%</b>
+                </div>
+                <div class="stat-val">₹0.00</div>
+                <div class="stat-info">third party wallet</div>
+            </div>
+        </div>
+        <button class="recycle-btn">One-click recycling</button>
+    </div>
+
+    <div class="action-menu">
+        <div class="action-item" onclick="location.href='deposit.html'"><i class="fas fa-wallet"></i>Deposit</div>
+        <div class="action-item" onclick="location.href='withdraw.html'"><i class="fas fa-hand-holding-usd"></i>Withdraw</div>
+        <div class="action-item" onclick="location.href='deposit_record.html'"><i class="fas fa-receipt"></i>Deposit record</div>
+        <div class="action-item" onclick="location.href='withdraw_record.html'"><i class="fas fa-history"></i>withdraw record</div>
+    </div>
+
+    <div class="grid-container">
+        <div class="grid-item active"><div class="grid-val">0.00</div><div class="grid-name">Lottery</div></div>
+        <div class="grid-item"><div class="grid-val">0.00</div><div class="grid-name">JILI</div></div>
+        <div class="grid-item"><div class="grid-val">0.00</div><div class="grid-name">JDB</div></div>
+        <div class="grid-item"><div class="grid-val">0.00</div><div class="grid-name">SaBa</div></div>
+        <div class="grid-item"><div class="grid-val">0.00</div><div class="grid-name">EVO_Video</div></div>
+        <div class="grid-item"><div class="grid-val">0.00</div><div class="grid-name">EVO_Electronic</div></div>
+        <div class="grid-item"><div class="grid-val">0.00</div><div class="grid-name">PP</div></div>
+        <div class="grid-item"><div class="grid-val">0.00</div><div class="grid-name">TB_Chess</div></div>
+        <div class="grid-item"><div class="grid-val">0.00</div><div class="grid-name">TB</div></div>
+    </div>
+
+    <div class="navbar">
+        <a href="index.html" class="nav-item"><i class="fas fa-home"></i><span>front page</span></a>
+        <a href="activity.html" class="nav-item"><i class="fas fa-gift"></i><span>activity</span></a>
+        <a href="promote.html" class="nav-item"><i class="fas fa-gem"></i><span>promote</span></a>
+        <a href="wallet.html" class="nav-item active"><i class="fas fa-wallet"></i><span>wallet</span></a>
+        <a href="mine.html" class="nav-item"><i class="fas fa-user"></i><span>my</span></a>
+    </div>
+
+</body>
+</html>

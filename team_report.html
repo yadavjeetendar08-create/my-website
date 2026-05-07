@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Report - RajaLuck</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --primary: #fb5b5b; --bg: #f8f9fb; --white: #fff; }
+        body { margin: 0; font-family: sans-serif; background: var(--bg); padding-bottom: 30px; }
+        .header { background: var(--white); padding: 15px; display: flex; align-items: center; border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 100; }
+        .header h2 { margin: 0; font-size: 18px; flex: 1; text-align: center; margin-right: 25px; }
+
+        /* Search & Filter Section */
+        .filter-sec { padding: 15px; background: var(--white); }
+        .search-box { display: flex; background: #f5f5f5; border-radius: 8px; padding: 5px 10px; align-items: center; margin-bottom: 10px; }
+        .search-box input { flex: 1; border: none; background: transparent; padding: 10px; outline: none; }
+        .search-btn { background: var(--primary); color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; }
+        .drop-row { display: flex; gap: 10px; }
+        .drop-box { flex: 1; padding: 10px; border: 1px solid #eee; border-radius: 5px; font-size: 13px; }
+
+        /* Summary Dashboard */
+        .summary-card { background: var(--primary); margin: 15px; border-radius: 12px; padding: 15px; color: white; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; text-align: center; }
+        .stat-box { border-right: 1px solid rgba(255,255,255,0.2); }
+        .stat-box:nth-child(even) { border-right: none; }
+        .stat-num { font-size: 20px; font-weight: bold; }
+        .stat-lbl { font-size: 11px; opacity: 0.9; margin-top: 5px; }
+
+        /* User Record Cards */
+        .user-card { background: var(--white); margin: 15px; border-radius: 10px; padding: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .card-header { font-weight: bold; border-bottom: 1px solid #f5f5f5; padding-bottom: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; }
+        .data-row { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px; color: #666; }
+        .val { color: #333; font-weight: 500; }
+    </style>
+</head>
+<body>
+
+    <div class="header"><i class="fas fa-chevron-left" onclick="history.back()"></i><h2>team report</h2></div>
+
+    <div class="filter-sec">
+        <div class="search-box">
+            <input type="text" id="uidSearch" placeholder="Search for subordinate UIDs">
+            <button class="search-btn" onclick="searchUser()"><i class="fas fa-search"></i></button>
+        </div>
+        <div class="drop-row">
+            <select class="drop-box" id="lvlFilter"><option value="all">All Levels</option><option value="1">Level 1</option><option value="2">Level 2</option></select>
+            <input type="date" class="drop-box" id="dateFilter">
+        </div>
+    </div>
+
+    <div class="summary-card">
+        <div class="stat-box"><div class="stat-num" id="sDepNum">0</div><div class="stat-lbl">Deposit number</div></div>
+        <div class="stat-box"><div class="stat-num" id="sDepAmt">0</div><div class="stat-lbl">Deposit amount</div></div>
+        <div class="stat-box"><div class="stat-num" id="sBettors">0</div><div class="stat-lbl">Number of bettors</div></div>
+        <div class="stat-box"><div class="stat-num" id="sTotalBet">0</div><div class="stat-lbl">Total bet</div></div>
+        <div class="stat-box"><div class="stat-num" id="sFirstDep">0</div><div class="stat-lbl">First deposit count</div></div>
+        <div class="stat-box"><div class="stat-num" id="sFirstAmt">0</div><div class="stat-lbl">First deposit amount</div></div>
+    </div>
+
+    <div id="subListContainer">
+        <p style="text-align:center; color:#999; padding:20px;">Loading team data...</p>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <script>
+        const firebaseConfig = { apiKey: "AIzaSyA9a_UA1cbr7sx0G1lu90ig18DfEDvmvgk", projectId: "ff-warzone-9c820", authDomain: "ff-warzone-9c820.firebaseapp.com", storageBucket: "ff-warzone-9c820.firebasestorage.app", messagingSenderId: "267357764090", appId: "1:267357764090:web:0691111afd07cb0ff20c43" };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore(); const auth = firebase.auth();
+        let curUID = null;
+
+        auth.onAuthStateChanged(user => {
+            if(user) { curUID = user.uid; loadTeamData(); }
+            else { location.href = 'login.html'; }
+        });
+
+        // 1. Feature: Search by UID
+        async function searchUser() {
+            const searchVal = document.getElementById('uidSearch').value;
+            if(!searchVal) return loadTeamData();
+            // Search logic here...
+        }
+
+        // 2. Feature: Load Team Stats & List
+        async function loadTeamData() {
+            try {
+                // Fetch subordinates where upline is current user
+                const snapshot = await db.collection("users").where("referBy", "==", curUID).get();
+                let html = "";
+                let totalDepAmt = 0, totalBetAmt = 0, bettors = 0;
+
+                if (snapshot.empty) {
+                    html = "<p style='text-align:center; padding:20px; color:#999;'>No subordinates found.</p>";
+                } else {
+                    snapshot.forEach(doc => {
+                        const d = doc.data();
+                        totalDepAmt += (d.totalDeposit || 0);
+                        totalBetAmt += (d.totalBet || 0);
+                        if(d.totalBet > 0) bettors++;
+
+                        html += `
+                        <div class="user-card">
+                            <div class="card-header">UID:${d.uid} <i class="far fa-copy" onclick="alert('Copied')"></i></div>
+                            <div class="data-row"><span>friends level</span> <span class="val">1</span></div>
+                            <div class="data-row"><span>Deposit amount</span> <span class="val">${d.totalDeposit || 0}</span></div>
+                            <div class="data-row"><span>Bet amount</span> <span class="val" style="color:#fb5b5b">${d.totalBet || 0}</span></div>
+                            <div class="data-row"><span>commission</span> <span class="val" style="color:#f5a623">${(d.totalBet * 0.01 || 0).toFixed(2)}</span></div>
+                        </div>`;
+                    });
+                }
+                
+                // Update Summary Dashboard
+                document.getElementById('sDepNum').innerText = snapshot.size;
+                document.getElementById('sDepAmt').innerText = totalDepAmt;
+                document.getElementById('sBettors').innerText = bettors;
+                document.getElementById('sTotalBet').innerText = totalBetAmt;
+                document.getElementById('subListContainer').innerHTML = html;
+
+            } catch (e) { console.error(e); }
+        }
+    </script>
+</body>
+</html>
